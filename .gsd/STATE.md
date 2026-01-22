@@ -1,28 +1,21 @@
-# STATE.md — Project Memory
-
-> Last Updated: 2026-01-21
+# GSD State
 
 ## Current Position
+- **Milestone**: M1 — MVP Dashboard
+- **Phase**: Phase 4 (Metrics Calculation) — Complete
+- **Status**: ✅ All metrics calculation implemented
 
-- **Milestone**: v1.0 — MVP Dashboard
-- **Phase**: 4 (Metrics Calculation) — Planning complete
-- **Status**: Ready for execution
-
-## Recent Activity
-
-- Completed Phase 3 (Analysis Engine)
-- **Planned Phase 4** with 3 plans (6 tasks):
-  - Plan 4.1: Metrics Types & Schema (wave 1)
-  - Plan 4.2: Core Metrics Calculators (wave 1)
-  - Plan 4.3: Metrics API & Historical Tracking (wave 2)
-
-## Key Metrics Defined
-- **ASoV**: Answer Share of Voice (mention frequency)
-- **AIGVR**: AI-Generated Visibility Rate (response presence)
-- **Authority Score**: Source quality (owned/earned/external)
-- **Sentiment Score**: Average sentiment (-1 to 1)
+## Last Action
+Implemented complete metrics calculation engine:
+- Created types: `src/types/metrics.ts`
+- Created schema: `supabase/migrations/003_metrics_schema.sql`
+- Created calculators: `src/lib/metrics/calculators.ts`
+- Created aggregator: `src/lib/metrics/aggregator.ts`
+- Created pipeline: `src/lib/metrics/pipeline.ts`
+- Created API routes: `src/app/api/metrics/route.ts`, `src/app/api/metrics/[id]/route.ts`
+- Build verified successfully
 
 ## Next Steps
-
-1. Run `003_metrics_schema.sql` in Supabase SQL Editor
-2. Run `/execute 4` to run all Phase 4 plans
+1. User must run `003_metrics_schema.sql` in Supabase SQL Editor
+2. Commit Phase 4 changes
+3. Begin Phase 5: Visualization Dashboard
