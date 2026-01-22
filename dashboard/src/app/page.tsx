@@ -1,4 +1,6 @@
 import { MetricCard } from '@/components/dashboard/metric-card';
+import { ASoVTrendChart } from '@/components/charts/asov-trend';
+import { AuthorityHeatmap } from '@/components/charts/authority-heatmap';
 import { BarChart3, TrendingUp, Heart, Award } from 'lucide-react';
 
 export default async function Home() {
@@ -52,6 +54,12 @@ export default async function Home() {
           trend={metrics.trends.sentiment}
           icon={Heart}
         />
+      </div>
+
+      {/* Charts */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <ASoVTrendChart />
+        <AuthorityHeatmap />
       </div>
 
       <div className="rounded-lg border bg-card p-6">
