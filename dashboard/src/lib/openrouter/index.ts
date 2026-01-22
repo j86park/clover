@@ -1,2 +1,3 @@
-// Placeholder - OpenRouter client will be created in Plan 1.3
-export { };
+// Re-export OpenRouter utilities
+export { getOpenRouterClient, queryLLM, type ChatMessage, type LLMQueryResult } from './client';
+export { AVAILABLE_MODELS, getAvailableModels, getModel, type ModelKey, type ModelConfig } from './models';
