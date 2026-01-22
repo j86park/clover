@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-> **Current Phase**: Phase 2 — Data Collection Engine  
+> **Current Phase**: Phase 6 — BAAS (Backend as a Service)  
 > **Milestone**: v1.0 — MVP Dashboard
 
 ## Must-Haves (from SPEC)
@@ -70,16 +70,16 @@
 ---
 
 ### Phase 5: Visualization Dashboard
-**Status**: ⬜ Not Started  
+**Status**: ✅ Complete  
 **Objective**: Build the web UI to display all metrics and insights
 
 **Deliverables:**
-- Dashboard layout with Clover-aligned design
-- ASoV charts and trend visualization
-- AIGVR metrics display
-- Source authority heatmap
-- Brand/competitor comparison views
-- Settings and configuration UI
+- Dashboard layout with Clover-aligned design ✓
+- ASoV charts and trend visualization ✓
+- AIGVR metrics display ✓
+- Source authority heatmap ✓
+- Brand/competitor comparison views ✓
+- Settings and configuration UI (basic)
 
 ---
 
