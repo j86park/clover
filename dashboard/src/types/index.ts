@@ -1,22 +1,23 @@
 /**
  * Core types for the LLM SEO Dashboard
+ * These match the Supabase database schema (snake_case)
  */
 
 export interface Brand {
     id: string;
     name: string;
-    domain?: string;
-    keywords: string[];
-    createdAt: Date;
-    updatedAt: Date;
+    domain?: string | null;
+    keywords: string[] | null;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface Competitor {
     id: string;
-    brandId: string;
+    brand_id: string;
     name: string;
-    domain?: string;
-    createdAt: Date;
+    domain?: string | null;
+    created_at: string;
 }
 
 export interface Prompt {
@@ -24,27 +25,27 @@ export interface Prompt {
     category: 'discovery' | 'comparison' | 'review';
     intent: string;
     template: string;
-    isActive: boolean;
-    createdAt: Date;
+    is_active: boolean;
+    created_at: string;
 }
 
 export interface Collection {
     id: string;
-    brandId: string;
+    brand_id: string;
     status: 'pending' | 'running' | 'completed' | 'failed';
-    startedAt?: Date;
-    completedAt?: Date;
-    createdAt: Date;
+    started_at?: string | null;
+    completed_at?: string | null;
+    created_at: string;
 }
 
 export interface LLMResponse {
     id: string;
-    collectionId: string;
-    promptId: string;
+    collection_id: string;
+    prompt_id: string;
     model: string;
-    promptText: string;
-    responseText: string;
-    tokensUsed?: number;
-    latencyMs?: number;
-    createdAt: Date;
+    prompt_text: string;
+    response_text: string;
+    tokens_used?: number | null;
+    latency_ms?: number | null;
+    created_at: string;
 }
