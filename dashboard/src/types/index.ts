@@ -76,3 +76,17 @@ export interface CollectionMetrics {
         total_brands: number;
     };
 }
+
+export interface ApiKey {
+    id: string;
+    key_hash: string;
+    key_prefix: string;
+    name: string;
+    tenant_id: string;
+    permissions: string[];
+    rate_limit: number;
+    is_active: boolean;
+    last_used_at?: string | null;
+    created_at: string;
+    expires_at?: string | null;
+}
