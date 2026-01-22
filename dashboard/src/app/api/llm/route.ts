@@ -3,7 +3,7 @@ import { z, ZodError } from 'zod';
 import { queryLLM } from '@/lib/openrouter/client';
 import { AVAILABLE_MODELS, type ModelKey } from '@/lib/openrouter/models';
 
-// Force dynamic rendering - this route requires runtime environment variables
+// Force dynamic rendering 
 export const dynamic = 'force-dynamic';
 
 const requestSchema = z.object({
