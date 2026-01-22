@@ -44,15 +44,15 @@
 ---
 
 ### Phase 3: Analysis Engine (NER & Sentiment)
-**Status**: ⬜ Not Started  
+**Status**: ✅ Complete  
 **Objective**: Extract brands, analyze sentiment, and map citations from LLM responses
 
 **Deliverables:**
-- NER model for brand extraction (spaCy or transformers-based)
-- Sentiment classifier for mention context (positive/neutral/negative)
-- Citation extractor and URL parser
-- Source classification logic (owned/earned/external)
-- Analysis pipeline connecting all components
+- NER model for brand extraction (LLM-based) ✓
+- Sentiment classifier for mention context (positive/neutral/negative) ✓
+- Citation extractor and URL parser ✓
+- Source classification logic (owned/earned/external) ✓
+- Analysis pipeline connecting all components ✓
 
 ---
 
