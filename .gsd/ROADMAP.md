@@ -1,11 +1,11 @@
 # ROADMAP.md
 
-> **Current Phase**: Not started  
+> **Current Phase**: Phase 2 — Data Collection Engine  
 > **Milestone**: v1.0 — MVP Dashboard
 
 ## Must-Haves (from SPEC)
 
-- [ ] Multi-LLM data collection via OpenRouter
+- [x] Multi-LLM data collection via OpenRouter
 - [ ] NER-based brand extraction
 - [ ] Sentiment analysis on mentions
 - [ ] Citation source classification
@@ -18,15 +18,15 @@
 ## Phases
 
 ### Phase 1: Foundation & Infrastructure
-**Status**: ⬜ Not Started  
+**Status**: ✅ Complete  
 **Objective**: Set up project structure, database, and OpenRouter integration
 
 **Deliverables:**
-- Next.js project with TypeScript
-- Database schema (PostgreSQL via Supabase or similar)
-- OpenRouter API integration with model abstraction
-- Environment configuration for Vercel deployment
-- Basic project scaffolding
+- Next.js project with TypeScript ✓
+- Database schema (PostgreSQL via Supabase) ✓
+- OpenRouter API integration with model abstraction ✓
+- Environment configuration for Vercel deployment ✓
+- Basic project scaffolding ✓
 
 ---
 
