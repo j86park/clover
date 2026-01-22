@@ -1,51 +1,35 @@
-# DECISIONS.md — Architecture Decision Records
+# DECISIONS.md — Project Decision Log
 
-## Format
-
-Each decision follows this structure:
-
-```
-### ADR-XXX: [Title]
-**Date:** YYYY-MM-DD  
-**Status:** Proposed | Accepted | Deprecated  
-**Context:** Why we needed to decide  
-**Decision:** What we decided  
-**Consequences:** What this means  
-```
+> Decisions made during planning and execution
 
 ---
 
-## Decisions
+## Phase 6: BAAS (Backend as a Service)
 
-### ADR-001: Use OpenRouter for LLM Access
 **Date:** 2026-01-21  
-**Status:** Accepted  
-**Context:** Need to query multiple LLMs (GPT-4, Claude, Gemini, Perplexity). Direct API integration with each provider would require multiple API keys and different client libraries.  
-**Decision:** Use OpenRouter as a unified gateway to all LLM providers.  
-**Consequences:** 
-- Single API integration point
-- Easy model switching without code changes
-- May have slightly higher latency vs. direct APIs
-- OpenRouter pricing applies
+**Context:** Discussion about making the LLM SEO Dashboard pluggable for Clover's portfolio
 
-### ADR-002: Vercel for Hosting
-**Date:** 2026-01-21  
-**Status:** Accepted  
-**Context:** Need reliable hosting for web dashboard with serverless functions for backend logic.  
-**Decision:** Use Vercel for both frontend and serverless functions.  
-**Consequences:**
-- Easy Next.js deployment
-- Built-in CI/CD
-- May need edge functions for time-sensitive operations
-- Serverless function timeout limits apply
+### Scope
+- Build an API-first layer on top of the dashboard
+- Enable any Clover "Leaf" company to integrate via REST API
+- Includes admin dashboard for API key management
 
-### ADR-003: Build NER from Scratch
-**Date:** 2026-01-21  
-**Status:** Accepted  
-**Context:** Need to extract brand entities from LLM responses. Pre-trained NER models focus on general entities (people, places, organizations) but not specifically product brands.  
-**Decision:** Build custom NER pipeline, potentially fine-tuning existing transformers models on brand-specific data.  
-**Consequences:**
-- More accurate brand extraction for our use case
-- Requires training data collection
-- Higher initial development effort
-- Can improve over time with user feedback
+### Approach
+- **Chosen**: Simple API keys (not full Supabase Auth)
+- **Reason**: Faster to implement, sufficient for B2B use case, each Leaf gets a key
+
+### Priority
+- **Position**: Phase 6 (after Phase 5 Dashboard UI)
+- **Reason**: Core dashboard needs to work first, then expose as service
+
+### Key Features
+- REST API v1 endpoints (`/api/v1/*`)
+- API key authentication middleware
+- Multi-tenant data isolation
+- Simple admin dashboard for key management
+- Usage tracking per API key
+- Webhook notifications (optional)
+
+### Constraints
+- MVP: Focus on analyze endpoint + API key management
+- Rate limiting: Basic implementation (can enhance later)

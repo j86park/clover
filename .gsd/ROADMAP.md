@@ -83,7 +83,21 @@
 
 ---
 
-### Phase 6: Testing Framework & Validation
+### Phase 6: BAAS (Backend as a Service)
+**Status**: ⬜ Not Started  
+**Objective**: Transform dashboard into pluggable API service for Clover portfolio
+
+**Deliverables:**
+- REST API v1 endpoints (/api/v1/*)
+- API key authentication middleware
+- Multi-tenant data isolation
+- Admin dashboard for API key management
+- Usage tracking per API key
+- Webhook notifications (stretch)
+
+---
+
+### Phase 7: Testing Framework & Validation
 **Status**: ⬜ Not Started  
 **Objective**: Build ground truth testing and validation tools
 
@@ -96,7 +110,7 @@
 
 ---
 
-### Phase 7: Polish & Launch Prep
+### Phase 8: Polish & Launch Prep
 **Status**: ⬜ Not Started  
 **Objective**: Final touches, documentation, and deployment
 
@@ -106,3 +120,4 @@
 - User onboarding flow
 - Documentation for Clover review
 - Production deployment on Vercel
+
