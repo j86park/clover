@@ -1,2 +1,3 @@
-// Placeholder - Supabase client will be created in Plan 1.2
-export { };
+// Re-export Supabase clients
+export { createClient as createBrowserClient } from './client';
+export { createClient as createServerClient } from './server';
