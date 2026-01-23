@@ -5,11 +5,11 @@ import type { ABTestResult } from '@/types/testing';
 
 export async function GET(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id: testId } = await params;
         const supabase = await createClient();
-        const testId = params.id;
 
         const { data: test, error } = await supabase
             .from('ab_tests')

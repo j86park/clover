@@ -3,10 +3,10 @@ import { runABTest } from '@/lib/testing/ab-test';
 
 export async function POST(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const testId = params.id;
+        const { id: testId } = await params;
 
         // Run async (don't await completion for the response)
         // In a real production app, use a queue (Bull/Inngest)

@@ -64,9 +64,15 @@ export default async function Home() {
 
       <div className="rounded-lg border bg-card p-6">
         <h2 className="text-xl font-semibold mb-2">Getting Started</h2>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground mb-4">
           Start a new collection to gather fresh data and calculate metrics for your brand.
         </p>
+        <a
+          href="/onboarding"
+          className="text-primary hover:underline text-sm font-medium"
+        >
+          New here? View the onboarding guide →
+        </a>
       </div>
     </div>
   );
