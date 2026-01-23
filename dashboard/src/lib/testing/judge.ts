@@ -47,7 +47,7 @@ export async function evaluateResponse(
     criteria: JudgeCriteria = { relevance: true, accuracy: true, completeness: true },
     expectedOutput?: string | string[]
 ): Promise<JudgeScore> {
-    const prompt = createJudgePrompt(response, input, criteria, expectedOutput);
+    const prompt = createJudgePrompt(response, input, criteria as unknown as Record<string, unknown>, expectedOutput);
 
     try {
         const result = await queryLLM(JUDGE_MODEL, [
