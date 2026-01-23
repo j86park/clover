@@ -98,7 +98,7 @@
 ---
 
 ### Phase 7: Testing Framework & Validation
-**Status**: ⬜ Not Started  
+**Status**: ✅ Complete
 **Objective**: Build ground truth testing and validation tools
 
 **Deliverables:**
@@ -120,4 +120,16 @@
 - User onboarding flow
 - Documentation for Clover review
 - Production deployment on Vercel
+
+---
+
+### Phase 9: Infrastructure Hardening (Post-MVP)
+**Status**: ⬜ Not Started
+**Objective**: Transition from MVP fire-and-forget patterns to production-grade reliable systems
+
+**Deliverables:**
+- Job queue system (Inngest or BullMQ) for long-running processes
+- Persistent `test_runs` and `audit_logs` database tables
+- Background worker architecture for A/B tests and data collection
+- Robust error recovery and retry mechanisms
 
