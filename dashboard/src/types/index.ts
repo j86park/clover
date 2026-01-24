@@ -49,3 +49,46 @@ export interface LLMResponse {
     latency_ms?: number | null;
     created_at: string;
 }
+
+export interface Metrics {
+    id: string;
+    collection_id: string;
+    brand_id: string;
+    asov: number;  // Average Share of Voice (0-100)
+    aigvr: number; // AI-Generated Visibility Rate (0-100)
+    sentiment_score: number; // (-1 to 1)
+    authority_owned: number;
+    authority_earned: number;
+    authority_external: number;
+    created_at: string;
+}
+
+export interface CollectionMetrics {
+    collection_id: string;
+    brand_metrics: Metrics;
+    competitor_metrics: Metrics[];
+    comparison: {
+        rankings: {
+            asov_rank: number;
+            aigvr_rank: number;
+            sentiment_rank: number;
+        };
+        total_brands: number;
+    };
+}
+
+export interface ApiKey {
+    id: string;
+    key_hash: string;
+    key_prefix: string;
+    name: string;
+    tenant_id: string;
+    permissions: string[];
+    rate_limit: number;
+    is_active: boolean;
+    last_used_at?: string | null;
+    created_at: string;
+    expires_at?: string | null;
+}
+
+export * from './testing';

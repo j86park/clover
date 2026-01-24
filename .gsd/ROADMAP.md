@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-> **Current Phase**: Phase 2 — Data Collection Engine  
+> **Current Phase**: Phase 6 — BAAS (Backend as a Service)  
 > **Milestone**: v1.0 — MVP Dashboard
 
 ## Must-Haves (from SPEC)
@@ -44,47 +44,61 @@
 ---
 
 ### Phase 3: Analysis Engine (NER & Sentiment)
-**Status**: ⬜ Not Started  
+**Status**: ✅ Complete  
 **Objective**: Extract brands, analyze sentiment, and map citations from LLM responses
 
 **Deliverables:**
-- NER model for brand extraction (spaCy or transformers-based)
-- Sentiment classifier for mention context (positive/neutral/negative)
-- Citation extractor and URL parser
-- Source classification logic (owned/earned/external)
-- Analysis pipeline connecting all components
+- NER model for brand extraction (LLM-based) ✓
+- Sentiment classifier for mention context (positive/neutral/negative) ✓
+- Citation extractor and URL parser ✓
+- Source classification logic (owned/earned/external) ✓
+- Analysis pipeline connecting all components ✓
 
 ---
 
 ### Phase 4: Metrics Calculation
-**Status**: ⬜ Not Started  
+**Status**: ✅ Complete  
 **Objective**: Compute core metrics from analyzed data
 
 **Deliverables:**
-- Answer Share of Voice (ASoV) calculator
-- AI-Generated Visibility Rate (AIGVR) calculator
-- Source authority scoring algorithm
-- Competitor comparison calculations
-- Historical trend tracking
+- Answer Share of Voice (ASoV) calculator ✓
+- AI-Generated Visibility Rate (AIGVR) calculator ✓
+- Source authority scoring algorithm ✓
+- Competitor comparison calculations ✓
+- Historical trend tracking ✓
 
 ---
 
 ### Phase 5: Visualization Dashboard
-**Status**: ⬜ Not Started  
+**Status**: ✅ Complete  
 **Objective**: Build the web UI to display all metrics and insights
 
 **Deliverables:**
-- Dashboard layout with Clover-aligned design
-- ASoV charts and trend visualization
-- AIGVR metrics display
-- Source authority heatmap
-- Brand/competitor comparison views
-- Settings and configuration UI
+- Dashboard layout with Clover-aligned design ✓
+- ASoV charts and trend visualization ✓
+- AIGVR metrics display ✓
+- Source authority heatmap ✓
+- Brand/competitor comparison views ✓
+- Settings and configuration UI (basic)
 
 ---
 
-### Phase 6: Testing Framework & Validation
-**Status**: ⬜ Not Started  
+### Phase 6: BAAS (Backend as a Service)
+**Status**: ✅ Complete  
+**Objective**: Transform dashboard into pluggable API service for Clover portfolio
+
+**Deliverables:**
+- REST API v1 endpoints (/api/v1/*) ✓
+- API key authentication middleware ✓
+- Multi-tenant data isolation ✓
+- Admin dashboard for API key management ✓
+- Usage tracking per API key ✓
+- Webhook notifications (stretch - deferred)
+
+---
+
+### Phase 7: Testing Framework & Validation
+**Status**: ✅ Complete
 **Objective**: Build ground truth testing and validation tools
 
 **Deliverables:**
@@ -96,7 +110,7 @@
 
 ---
 
-### Phase 7: Polish & Launch Prep
+### Phase 8: Polish & Launch Prep
 **Status**: ⬜ Not Started  
 **Objective**: Final touches, documentation, and deployment
 
@@ -106,3 +120,16 @@
 - User onboarding flow
 - Documentation for Clover review
 - Production deployment on Vercel
+
+---
+
+### Phase 9: Infrastructure Hardening (Post-MVP)
+**Status**: ⬜ Not Started
+**Objective**: Transition from MVP fire-and-forget patterns to production-grade reliable systems
+
+**Deliverables:**
+- Job queue system (Inngest or BullMQ) for long-running processes
+- Persistent `test_runs` and `audit_logs` database tables
+- Background worker architecture for A/B tests and data collection
+- Robust error recovery and retry mechanisms
+

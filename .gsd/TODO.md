@@ -24,3 +24,8 @@
 
 ### Technical Debt
 (None yet)
+
+### Infrastructure Hardening (Post-MVP)
+- [ ] Implement job queue (Inngest/BullMQ) for long-running tests
+- [ ] Add persistent `test_runs` and `audit_logs` tables
+- [ ] Replace fire-and-forget API handlers with background workers
