@@ -20,9 +20,10 @@ interface PipelineResult {
  * Fetches analyses, calculates metrics, and stores results
  */
 export async function runMetricsPipeline(
-    collectionId: string
+    collectionId: string,
+    supabaseClient?: any
 ): Promise<PipelineResult> {
-    const supabase = await createServerClient();
+    const supabase = supabaseClient || await createServerClient();
 
     try {
         // 1. Get collection info
@@ -42,10 +43,11 @@ export async function runMetricsPipeline(
         }
 
         // 2. Get all analyses for this collection
+        // Join with responses to filter by collection_id
         const { data: analyses, error: analysisError } = await supabase
             .from('analysis')
-            .select('*')
-            .eq('collection_id', collectionId);
+            .select('*, responses!inner(collection_id)')
+            .eq('responses.collection_id', collectionId);
 
         if (analysisError) {
             return {
@@ -103,6 +105,9 @@ export async function runMetricsPipeline(
             recommendation_rate: m.recommendation_rate,
             total_mentions: m.total_mentions,
             total_responses: m.total_responses,
+            owned_citations: m.owned_citations || 0,
+            earned_citations: m.earned_citations || 0,
+            external_citations: m.external_citations || 0,
         }));
 
         const { error: insertError } = await supabase
@@ -138,9 +143,10 @@ export async function runMetricsPipeline(
  * Get calculated metrics for a collection
  */
 export async function getCollectionMetrics(
-    collectionId: string
+    collectionId: string,
+    supabaseClient?: any
 ): Promise<CollectionMetrics | null> {
-    const supabase = await createServerClient();
+    const supabase = supabaseClient || await createServerClient();
 
     // Get collection with brand info
     const { data: collection } = await supabase
@@ -161,10 +167,10 @@ export async function getCollectionMetrics(
 
     // Separate brand from competitors
     const brandMetric = metrics.find(
-        m => m.brand_id === collection.brand.id
+        (m: any) => m.brand_id === collection.brand.id
     );
     const competitorMetrics = metrics.filter(
-        m => m.brand_id !== collection.brand.id
+        (m: any) => m.brand_id !== collection.brand.id
     );
 
     return {

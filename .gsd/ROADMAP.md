@@ -1,7 +1,7 @@
 # ROADMAP.md
 
-> **Current Phase**: Phase 6 — BAAS (Backend as a Service)  
-> **Milestone**: v1.0 — MVP Dashboard
+> **Current Phase**: Launch Ready (Post-Phase 9)  
+> **Milestone**: v1.0 — MVP Dashboard Complete
 
 ## Must-Haves (from SPEC)
 
@@ -111,7 +111,7 @@
 ---
 
 ### Phase 8: Polish & Launch Prep
-**Status**: ⬜ Not Started  
+**Status**: ✅ Complete
 **Objective**: Final touches, documentation, and deployment
 
 **Deliverables:**
@@ -124,7 +124,7 @@
 ---
 
 ### Phase 9: Infrastructure Hardening (Post-MVP)
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Transition from MVP fire-and-forget patterns to production-grade reliable systems
 
 **Deliverables:**
@@ -133,3 +133,14 @@
 - Background worker architecture for A/B tests and data collection
 - Robust error recovery and retry mechanisms
 
+---
+
+### Phase 10: Bug Squashing & UX Refinement
+**Status**: 🚧 In Progress
+**Objective**: Resolve high-priority UI/UX bugs and ensure feature parity across pages
+
+**Deliverables:**
+- Fix Citation Drill-down Modal (detect and resolve event blocking)
+- Restore Analysis Page (create missing route and implement data view)
+- Verify data consistency between Dashboard and Analysis views
+- General UX polish (tooltips, loading states)

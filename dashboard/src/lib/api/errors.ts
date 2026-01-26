@@ -1,50 +1,86 @@
 /**
- * Custom API Error classes for consistent error handling
+ * Standardized API Error Handling
+ * Consistent error format for all API routes
  */
 
-export class ApiError extends Error {
-    public readonly statusCode: number;
-    public readonly details?: unknown;
+import { NextResponse } from 'next/server';
 
-    constructor(message: string, statusCode = 400, details?: unknown) {
+export class ApiError extends Error {
+    public readonly status: number;
+    public readonly code: string;
+
+    constructor(message: string, status: number = 500, code?: string) {
         super(message);
         this.name = 'ApiError';
-        this.statusCode = statusCode;
-        this.details = details;
+        this.status = status;
+        this.code = code || this.generateCode(status);
+    }
+
+    private generateCode(status: number): string {
+        switch (status) {
+            case 400: return 'BAD_REQUEST';
+            case 401: return 'UNAUTHORIZED';
+            case 403: return 'FORBIDDEN';
+            case 404: return 'NOT_FOUND';
+            case 409: return 'CONFLICT';
+            case 422: return 'UNPROCESSABLE_ENTITY';
+            case 429: return 'RATE_LIMITED';
+            default: return 'INTERNAL_ERROR';
+        }
+    }
+
+    toJSON() {
+        return {
+            error: {
+                message: this.message,
+                code: this.code,
+            },
+        };
     }
 }
 
-export class ValidationError extends ApiError {
-    constructor(message: string, details?: unknown) {
-        super(message, 400, details);
-        this.name = 'ValidationError';
-    }
-}
-
+/**
+ * 404 Not Found Error
+ */
 export class NotFoundError extends ApiError {
-    constructor(message = 'Resource not found') {
-        super(message, 404);
+    constructor(message: string = 'Resource not found') {
+        super(message, 404, 'NOT_FOUND');
         this.name = 'NotFoundError';
     }
 }
 
-export class UnauthorizedError extends ApiError {
-    constructor(message = 'Unauthorized') {
-        super(message, 401);
-        this.name = 'UnauthorizedError';
-    }
-}
-
+/**
+ * 403 Forbidden Error
+ */
 export class ForbiddenError extends ApiError {
-    constructor(message = 'Forbidden') {
-        super(message, 403);
+    constructor(message: string = 'Access forbidden') {
+        super(message, 403, 'FORBIDDEN');
         this.name = 'ForbiddenError';
     }
 }
 
 /**
- * Type guard to check if an error is an ApiError
+ * Create a standardized error response
  */
-export function isApiError(error: unknown): error is ApiError {
-    return error instanceof ApiError;
+export function createErrorResponse(
+    error: unknown,
+    defaultStatus: number = 500
+): NextResponse {
+    if (error instanceof ApiError) {
+        return NextResponse.json(error.toJSON(), { status: error.status });
+    }
+
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred';
+    const apiError = new ApiError(message, defaultStatus);
+
+    return NextResponse.json(apiError.toJSON(), { status: defaultStatus });
+}
+
+/**
+ * Handle errors in API routes
+ * Usage: catch (error) { return handleApiError(error); }
+ */
+export function handleApiError(error: unknown): NextResponse {
+    console.error('API Error:', error);
+    return createErrorResponse(error);
 }

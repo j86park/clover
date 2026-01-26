@@ -58,9 +58,23 @@ export function aggregateByBrand(
             const brandKey = mention.brand_name.toLowerCase();
 
             // Try to find existing aggregation or create new one
-            let agg = [...aggregations.values()].find(
-                a => a.brand_name.toLowerCase() === brandKey
-            );
+            let agg = [...aggregations.values()].find(a => {
+                const existingName = a.brand_name.toLowerCase();
+                const currentName = brandKey;
+
+                // Exact match
+                if (existingName === currentName) return true;
+
+                // Fuzzy/Partial Match (e.g. "Clover" for "Clover Labs")
+                // Only do this for names longer than 3 chars to avoid false positives
+                if (existingName.length > 3 && currentName.length > 3) {
+                    if (existingName.includes(currentName) || currentName.includes(existingName)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            });
 
             if (!agg) {
                 agg = {
@@ -154,6 +168,9 @@ export function calculateBrandMetrics(
             ),
             total_mentions: agg.mentions,
             total_responses: agg.responses_with_brand.size,
+            owned_citations: agg.owned_citations,
+            earned_citations: agg.earned_citations,
+            external_citations: agg.external_citations,
         });
     }
 
