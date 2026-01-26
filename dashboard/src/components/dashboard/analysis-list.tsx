@@ -69,17 +69,31 @@ export function AnalysisList({ analyses }: AnalysisListProps) {
                             <div className="space-y-3">
                                 <h4 className="text-sm font-semibold uppercase tracking-tight text-muted-foreground">Top Mentions</h4>
                                 <div className="space-y-2">
-                                    {item.mentions.slice(0, 3).map((m, i) => (
-                                        <div key={i} className="p-3 rounded-md bg-muted/50 border text-sm">
-                                            <div className="flex justify-between items-center mb-1">
-                                                <span className="font-bold text-primary">{m.brand_name}</span>
-                                                <Badge variant={m.sentiment === 'positive' ? 'default' : m.sentiment === 'negative' ? 'destructive' : 'secondary'} className="h-4 text-[10px]">
-                                                    {m.sentiment}
-                                                </Badge>
+                                    {item.mentions.slice(0, 3).map((m, i) => {
+                                        const isPositive = m.sentiment === 'positive';
+                                        const isNegative = m.sentiment === 'negative';
+
+                                        // Strategy 2: Resilient Inline Styles
+                                        const style = {
+                                            backgroundColor: isPositive ? 'rgba(16, 185, 129, 0.15)' : isNegative ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                                            borderColor: isPositive ? 'rgba(16, 185, 129, 0.4)' : isNegative ? 'rgba(239, 68, 68, 0.4)' : 'rgba(245, 158, 11, 0.4)',
+                                            borderLeftWidth: '4px',
+                                            borderLeftStyle: 'solid' as const,
+                                            borderLeftColor: isPositive ? '#10b981' : isNegative ? '#ef4444' : '#f59e0b',
+                                        };
+
+                                        return (
+                                            <div key={i} className="p-3 rounded-md border text-sm transition-all" style={style}>
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <span className="font-bold text-primary">{m.brand_name}</span>
+                                                    <Badge variant={isPositive ? 'default' : isNegative ? 'destructive' : 'secondary'} className="h-4 text-[10px]">
+                                                        {m.sentiment}
+                                                    </Badge>
+                                                </div>
+                                                <p className="text-xs italic text-muted-foreground line-clamp-2">"{m.context}"</p>
                                             </div>
-                                            <p className="text-xs italic text-muted-foreground line-clamp-2">"{m.context}"</p>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                     {item.mentions.length === 0 && <p className="text-xs text-muted-foreground italic">No brand mentions detected.</p>}
                                 </div>
                             </div>
@@ -96,7 +110,16 @@ export function AnalysisList({ analyses }: AnalysisListProps) {
                                             <ExternalLink className="h-3 w-3 text-muted-foreground group-hover:text-primary" />
                                         </a>
                                     ))}
-                                    {item.citations.length === 0 && <p className="text-xs text-muted-foreground italic">No citations found in response.</p>}
+                                    {item.citations.length === 0 && item.mentions.length > 0 && (
+                                        <p className="text-xs text-muted-foreground italic leading-relaxed">
+                                            The model recalls and mentions brands but did not provide direct website citations in this response.
+                                        </p>
+                                    )}
+                                    {item.citations.length === 0 && item.mentions.length === 0 && (
+                                        <p className="text-xs text-muted-foreground italic">
+                                            No citations found in response.
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>

@@ -72,9 +72,6 @@ export function AuthorityHeatmap({ data = defaultData, onCategoryClick }: Author
                                                     <span className="font-bold text-foreground">
                                                         {payload[0].value} ({percentage}%)
                                                     </span>
-                                                    <span className="text-[0.6rem] text-muted-foreground mt-1">
-                                                        Click bar for samples →
-                                                    </span>
                                                 </div>
                                             </div>
                                         </div>

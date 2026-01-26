@@ -32,7 +32,7 @@ export function CompetitorTable({ brandMetrics, competitorMetrics }: CompetitorT
     );
 
     const totalAuthority = (m: Metrics) =>
-        m.authority_owned + m.authority_earned + m.authority_external;
+        (m.owned_citations || 0) + (m.earned_citations || 0) + (m.external_citations || 0);
     const authorityWinner = allBrands.reduce((prev, current) =>
         totalAuthority(current) > totalAuthority(prev) ? current : prev
     );
@@ -61,7 +61,7 @@ export function CompetitorTable({ brandMetrics, competitorMetrics }: CompetitorT
 
                                 return (
                                     <TableRow
-                                        key={brand.brand_id}
+                                        key={brand.brand_id || brand.brand_name}
                                         className={isUserBrand ? 'bg-primary/5 font-medium' : ''}
                                     >
                                         <TableCell>
@@ -74,7 +74,7 @@ export function CompetitorTable({ brandMetrics, competitorMetrics }: CompetitorT
                                         </TableCell>
                                         <TableCell className="text-right">
                                             {brand.asov.toFixed(1)}%
-                                            {brand.brand_id === asovWinner.brand_id && (
+                                            {brand.brand_name === asovWinner.brand_name && (
                                                 <Badge variant="success" className="ml-2">
                                                     🏆
                                                 </Badge>
@@ -82,7 +82,7 @@ export function CompetitorTable({ brandMetrics, competitorMetrics }: CompetitorT
                                         </TableCell>
                                         <TableCell className="text-right">
                                             {brand.aigvr.toFixed(1)}%
-                                            {brand.brand_id === aigvrWinner.brand_id && (
+                                            {brand.brand_name === aigvrWinner.brand_name && (
                                                 <Badge variant="success" className="ml-2">
                                                     🏆
                                                 </Badge>
@@ -90,7 +90,7 @@ export function CompetitorTable({ brandMetrics, competitorMetrics }: CompetitorT
                                         </TableCell>
                                         <TableCell className="text-right">
                                             {(brand.sentiment_score * 100).toFixed(0)}%
-                                            {brand.brand_id === sentimentWinner.brand_id && (
+                                            {brand.brand_name === sentimentWinner.brand_name && (
                                                 <Badge variant="success" className="ml-2">
                                                     🏆
                                                 </Badge>
@@ -98,7 +98,7 @@ export function CompetitorTable({ brandMetrics, competitorMetrics }: CompetitorT
                                         </TableCell>
                                         <TableCell className="text-right">
                                             {authority}
-                                            {brand.brand_id === authorityWinner.brand_id && (
+                                            {brand.brand_name === authorityWinner.brand_name && (
                                                 <Badge variant="success" className="ml-2">
                                                     🏆
                                                 </Badge>
