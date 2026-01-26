@@ -2,11 +2,25 @@ import { CollectionList } from '@/components/collections/collection-list';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
+import { createServerClient } from '@/lib/supabase';
 
 export default async function CollectionsPage() {
-    // For now, show empty state
-    // In Phase 6, this will fetch from API
-    const collections: any[] = [];
+    const supabase = await createServerClient();
+
+    // Fetch collections with their brand names
+    const { data: collections, error } = await supabase
+        .from('collections')
+        .select(`
+            *,
+            brands (
+                name
+            )
+        `)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching collections:', error);
+    }
 
     return (
         <div className="space-y-6">
@@ -25,7 +39,7 @@ export default async function CollectionsPage() {
                 </Link>
             </div>
 
-            <CollectionList collections={collections} />
+            <CollectionList collections={(collections || []) as any} />
         </div>
     );
 }
