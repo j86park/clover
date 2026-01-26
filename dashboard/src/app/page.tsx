@@ -1,6 +1,5 @@
 import { MetricCard } from '@/components/dashboard/metric-card';
-import { ASoVTrendChart } from '@/components/charts/asov-trend';
-import { AuthorityHeatmap } from '@/components/charts/authority-heatmap';
+import { DashboardClient } from '@/components/dashboard/dashboard-client';
 import { BarChart3, TrendingUp, Heart, Award } from 'lucide-react';
 import { createServerClient } from '@/lib/supabase';
 import { getCollectionMetrics } from '@/lib/metrics/pipeline';
@@ -33,6 +32,7 @@ export default async function Home() {
   let hasData = false;
   let chartData: { date: string; asov: number }[] = [];
   let authorityData = { owned: 0, earned: 0, external: 0 };
+  let currentCollectionId = '';
 
   if (brand) {
     // 2. Get the latest completed collection for this brand
@@ -46,6 +46,7 @@ export default async function Home() {
       .maybeSingle();
 
     if (collection) {
+      currentCollectionId = collection.id;
       const collectionMetrics = await getCollectionMetrics(collection.id);
       if (collectionMetrics) {
         const bm = collectionMetrics.brand_metrics;
@@ -147,11 +148,12 @@ export default async function Home() {
         />
       </div>
 
-      {/* Charts */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <ASoVTrendChart data={hasData ? chartData : undefined} />
-        <AuthorityHeatmap data={hasData ? authorityData : undefined} />
-      </div>
+      {/* Interactive Charts & Modal Section */}
+      <DashboardClient
+        collectionId={currentCollectionId}
+        chartData={chartData}
+        authorityData={authorityData}
+      />
 
       {!hasData && (
         <div className="rounded-lg border bg-card p-6 border-dashed">

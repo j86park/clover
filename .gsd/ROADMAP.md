@@ -133,3 +133,14 @@
 - Background worker architecture for A/B tests and data collection
 - Robust error recovery and retry mechanisms
 
+---
+
+### Phase 10: Bug Squashing & UX Refinement
+**Status**: 🚧 In Progress
+**Objective**: Resolve high-priority UI/UX bugs and ensure feature parity across pages
+
+**Deliverables:**
+- Fix Citation Drill-down Modal (detect and resolve event blocking)
+- Restore Analysis Page (create missing route and implement data view)
+- Verify data consistency between Dashboard and Analysis views
+- General UX polish (tooltips, loading states)
