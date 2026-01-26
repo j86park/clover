@@ -91,4 +91,24 @@ export interface ApiKey {
     expires_at?: string | null;
 }
 
+export interface AuditLog {
+    id: string;
+    user_id?: string | null;
+    action: string;
+    resource_type: string;
+    resource_id?: string | null;
+    details: Record<string, any>;
+    created_at: string;
+}
+
+export interface TestRun {
+    id: string;
+    test_type: 'correlation' | 'ab' | 'semantic';
+    configuration: Record<string, any>;
+    status: 'pending' | 'running' | 'completed' | 'failed';
+    results: Record<string, any>;
+    created_at: string;
+}
+
+
 export * from './testing';

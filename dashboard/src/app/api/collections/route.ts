@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z, ZodError } from 'zod';
 import { createClient } from '@/lib/supabase/server';
-import { runCollection } from '@/lib/collector/runner';
+import { inngest } from '@/lib/inngest/client';
 import { AVAILABLE_MODELS, type ModelKey } from '@/lib/openrouter/models';
 
 export const dynamic = 'force-dynamic';
@@ -66,18 +66,20 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Run collection (this runs synchronously for now)
-        // In production, you'd want to queue this as a background job
-        const result = await runCollection({
-            brandId,
-            models: validModels,
-            promptIds,
-            concurrency: 3,
+        // Dispatch background job via Inngest
+        // This responds immediately to the client, preventing Vercel timeouts
+        await inngest.send({
+            name: 'collection.start',
+            data: {
+                brandId,
+                models: validModels,
+                promptIds,
+            },
         });
 
         return NextResponse.json({
             success: true,
-            data: result,
+            message: 'Data collection started in background',
         });
     } catch (error) {
         if (error instanceof ZodError) {
