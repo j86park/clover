@@ -5,18 +5,26 @@ export const dynamic = 'force-dynamic';
 
 export default async function AnalysisPage() {
     const supabase = await createServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    // Fetch analyses with their related model and content
+    // Fetch analyses for the user's brand
     const { data: analyses, error } = await supabase
         .from('analysis')
         .select(`
             *,
-            responses (
+            responses!inner (
                 model,
                 prompt_text,
-                response_text
+                response_text,
+                collections!inner (
+                    brand_id,
+                    brands!inner (
+                        user_id
+                    )
+                )
             )
         `)
+        .eq('responses.collections.brands.user_id', user?.id)
         .order('created_at', { ascending: false })
         .limit(20);
 

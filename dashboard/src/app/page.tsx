@@ -7,11 +7,13 @@ import { getCollectionMetrics } from '@/lib/metrics/pipeline';
 export default async function Home() {
   const supabase = await createServerClient();
 
-  // 1. Fetch the Clover Labs brand
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // 1. Fetch the user's primary brand
   const { data: brand } = await supabase
     .from('brands')
     .select('id, name')
-    .eq('name', 'Clover Labs')
+    .eq('user_id', user?.id)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();

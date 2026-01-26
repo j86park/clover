@@ -16,14 +16,17 @@ export default async function CollectionDetailPage({ params }: PageProps) {
     const { id } = await params;
     const supabase = await createServerClient();
 
-    // Fetch the collection to make sure it exists
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Fetch the collection to make sure it exists and belongs to the user
     const { data: collection } = await supabase
         .from('collections')
         .select(`
             *,
-            brands (name)
+            brands!inner (name, user_id)
         `)
         .eq('id', id)
+        .eq('brands.user_id', user?.id)
         .single();
 
     if (!collection) {
