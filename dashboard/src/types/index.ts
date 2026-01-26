@@ -57,9 +57,9 @@ export interface Metrics {
     asov: number;  // Average Share of Voice (0-100)
     aigvr: number; // AI-Generated Visibility Rate (0-100)
     sentiment_score: number; // (-1 to 1)
-    authority_owned: number;
-    authority_earned: number;
-    authority_external: number;
+    owned_citations: number;
+    earned_citations: number;
+    external_citations: number;
     created_at: string;
 }
 
