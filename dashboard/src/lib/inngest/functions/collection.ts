@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { queryLLM } from "@/lib/openrouter/client";
 import { AVAILABLE_MODELS, type ModelKey } from "@/lib/openrouter/models";
 import { generatePromptInstances } from "@/lib/collector/generator";
+import { runAnalysisPipeline } from "@/lib/analysis/pipeline";
+import { runMetricsPipeline } from "@/lib/metrics/pipeline";
 import type { Brand, Prompt, Competitor } from "@/types";
 
 interface DBBrand extends Brand {
@@ -110,7 +112,22 @@ export const collectionStart = inngest.createFunction(
                 }
             }
 
-            // 5. Finalize
+            // 5. Run Analysis Pipeline
+            await step.run("analyze-data", async () => {
+                return await runAnalysisPipeline({
+                    collectionId,
+                    trackedBrand: context.brand.name,
+                    brandDomain: context.brand.domain ?? undefined,
+                    supabase: supabase
+                });
+            });
+
+            // 6. Run Metrics Pipeline
+            await step.run("calculate-metrics", async () => {
+                return await runMetricsPipeline(collectionId, supabase);
+            });
+
+            // 7. Finalize
             await step.run("finalize-collection", async () => {
                 await supabase
                     .from('collections')

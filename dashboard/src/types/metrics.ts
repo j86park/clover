@@ -14,6 +14,9 @@ export interface BrandMetrics {
     recommendation_rate: number; // % of mentions that recommend (0-100)
     total_mentions: number;
     total_responses: number;
+    owned_citations: number;
+    earned_citations: number;
+    external_citations: number;
 }
 
 export interface StoredMetrics extends BrandMetrics {

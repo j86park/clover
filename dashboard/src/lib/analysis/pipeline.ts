@@ -16,6 +16,7 @@ export interface PipelineConfig {
     competitorDomains?: string[];
     trackedBrand?: string;
     concurrency?: number;
+    supabase?: any;
 }
 
 export interface PipelineResult {
@@ -45,7 +46,7 @@ export async function runAnalysisPipeline(
         concurrency = 2
     } = config;
 
-    const supabase = await createClient();
+    const supabase = config.supabase || await createClient();
 
     // Load responses for collection
     const { data: responses, error } = await supabase
