@@ -153,3 +153,17 @@
 - Middleware guard for protected routes ✓
 - RLS migration for brand ownership ✓
 - User-to-Brand profile resolution ✓
+
+---
+
+### Phase 12: Programmable API Access
+**Status**: 🚧 In Progress
+**Objective**: Enable real API key generation and programmatic JSON endpoints for terminal/script access to metrics
+
+**Deliverables:**
+- `api_keys` table with SHA-256 hashed key storage
+- Key generation UI with secure one-time display
+- API authentication middleware (`X-API-Key` header)
+- `/api/v1/metrics` JSON endpoint for ASoV, AIGVR, Sentiment, Competitors
+- Scoped permissions (`metrics:read`)
+- Usage tracking (`last_used_at`)
