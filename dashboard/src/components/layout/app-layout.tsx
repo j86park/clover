@@ -17,13 +17,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
     return (
         <div className="flex h-screen w-full bg-background overflow-hidden">
-            <Sidebar />
+            {/* Sidebar container - reserves space even during dynamic load */}
+            <div className="hidden md:block w-64 shrink-0">
+                <Sidebar />
+            </div>
             <div className="flex flex-1 flex-col min-h-screen min-w-0">
                 <Header />
                 <main className="flex-1 overflow-y-auto p-6">
-                    <div className="mx-auto w-full">
-                        {children}
-                    </div>
+                    {children}
                 </main>
             </div>
         </div>
