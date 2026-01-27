@@ -1,9 +1,11 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Sidebar } from '@/components/layout/sidebar';
+import dynamic from 'next/dynamic';
 import { Header } from '@/components/layout/header';
 import * as React from 'react';
+
+const Sidebar = dynamic(() => import('./sidebar').then(mod => mod.Sidebar), { ssr: false });
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -14,12 +16,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <div className="flex h-screen">
+        <div className="flex h-screen w-full bg-background overflow-hidden">
             <Sidebar />
-            <div className="flex flex-1 flex-col md:pl-64">
+            <div className="flex flex-1 flex-col min-h-screen min-w-0">
                 <Header />
-                <main className="flex-1 overflow-y-auto bg-background p-6">
-                    {children}
+                <main className="flex-1 overflow-y-auto p-6">
+                    <div className="mx-auto w-full">
+                        {children}
+                    </div>
                 </main>
             </div>
         </div>

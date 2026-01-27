@@ -53,8 +53,8 @@ export function Sidebar() {
     }, []);
 
     return (
-        <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r bg-background transition-transform md:translate-x-0">
-            <div className="flex h-full flex-col">
+        <aside className="h-screen w-64 border-r bg-background shrink-0 hidden md:flex md:flex-col">
+            <div className="flex h-full flex-col w-full">
                 {/* Logo */}
                 <div className="flex h-16 items-center border-b px-6">
                     <h1 className="text-xl font-bold">LLM SEO Dashboard</h1>
