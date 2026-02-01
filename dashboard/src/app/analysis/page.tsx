@@ -3,12 +3,17 @@ import { AnalysisList } from '@/components/dashboard/analysis-list';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AnalysisPage() {
+interface PageProps {
+    searchParams: Promise<{ collection_id?: string }>;
+}
+
+export default async function AnalysisPage({ searchParams }: PageProps) {
+    const { collection_id } = await searchParams;
     const supabase = await createServerClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     // Fetch analyses for the user's brand
-    const { data: analyses, error } = await supabase
+    let query = supabase
         .from('analysis')
         .select(`
             *,
@@ -17,6 +22,7 @@ export default async function AnalysisPage() {
                 prompt_text,
                 response_text,
                 collections!inner (
+                    id,
                     brand_id,
                     brands!inner (
                         user_id
@@ -27,6 +33,12 @@ export default async function AnalysisPage() {
         .eq('responses.collections.brands.user_id', user?.id)
         .order('created_at', { ascending: false })
         .limit(20);
+
+    if (collection_id) {
+        query = query.eq('responses.collections.id', collection_id);
+    }
+
+    const { data: analyses, error } = await query;
 
     if (error) {
         console.error('Error fetching analyses:', error.message, error.hint, error.details);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,15 +9,57 @@ import { Collection } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { Trash2, Loader2, ExternalLink } from 'lucide-react';
 import { deleteCollection } from '@/app/actions/collections';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 interface CollectionListProps {
     collections: (Collection & { brands?: { name: string } })[];
 }
 
 export function CollectionList({ collections: initialCollections }: CollectionListProps) {
+    const router = useRouter();
+    const supabase = createClient();
     const [collections, setCollections] = useState(initialCollections);
     const [isPending, startTransition] = useTransition();
     const [deletingId, setDeletingId] = useState<string | null>(null);
+
+    // Sync state with props when server-side data changes
+    useEffect(() => {
+        setCollections(initialCollections);
+    }, [initialCollections]);
+
+    // Subscribe to realtime updates
+    useEffect(() => {
+        const channel = supabase
+            .channel('collections-status-updates')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'collections',
+                },
+                (payload) => {
+                    const updatedCollection = payload.new as Collection;
+
+                    // Update local state for immediate feedback
+                    setCollections(prev =>
+                        prev.map(c => c.id === updatedCollection.id
+                            ? { ...c, status: updatedCollection.status, completed_at: updatedCollection.completed_at }
+                            : c
+                        )
+                    );
+
+                    // Refresh server data to ensure consistency (e.g., related data)
+                    router.refresh();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [supabase, router]);
 
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this collection and all its results?')) {

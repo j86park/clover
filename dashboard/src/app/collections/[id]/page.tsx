@@ -39,18 +39,23 @@ export default async function CollectionDetailPage({ params }: PageProps) {
     if (!metricsResult) {
         return (
             <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                    <Link href="/collections">
-                        <Button variant="outline" size="icon">
-                            <ArrowLeft className="h-4 w-4" />
-                        </Button>
-                    </Link>
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Collection Details</h1>
-                        <p className="text-muted-foreground">
-                            {collection.brands?.name} • Collection {id.slice(0, 8)}
-                        </p>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <Link href="/collections">
+                            <Button variant="outline" size="icon">
+                                <ArrowLeft className="h-4 w-4" />
+                            </Button>
+                        </Link>
+                        <div>
+                            <h1 className="text-3xl font-bold tracking-tight">Collection Details</h1>
+                            <p className="text-muted-foreground">
+                                {collection.brands?.name} • Collection {id.slice(0, 8)}
+                            </p>
+                        </div>
                     </div>
+                    <Link href={`/analysis?collection_id=${id}`}>
+                        <Button variant="outline">View Analysis</Button>
+                    </Link>
                 </div>
                 <Card>
                     <CardContent className="py-20 text-center">
@@ -67,18 +72,23 @@ export default async function CollectionDetailPage({ params }: PageProps) {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-4">
-                <Link href="/collections">
-                    <Button variant="outline" size="icon">
-                        <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                </Link>
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Collection Details</h1>
-                    <p className="text-muted-foreground">
-                        {brand_metrics.brand_name} • Collection {id.slice(0, 8)}
-                    </p>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <Link href="/collections">
+                        <Button variant="outline" size="icon">
+                            <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                    </Link>
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight">Collection Details</h1>
+                        <p className="text-muted-foreground">
+                            {brand_metrics.brand_name} • Collection {id.slice(0, 8)}
+                        </p>
+                    </div>
                 </div>
+                <Link href={`/analysis?collection_id=${id}`}>
+                    <Button variant="outline">View Analysis</Button>
+                </Link>
             </div>
 
             {/* Metrics Summary */}

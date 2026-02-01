@@ -20,8 +20,9 @@ export default function NewCollectionPage() {
     const [success, setSuccess] = useState(false);
     const [brandName, setBrandName] = useState('');
     const [keywords, setKeywords] = useState<string[]>([]);
+    const [competitorCount, setCompetitorCount] = useState(0);
     const [availablePrompts, setAvailablePrompts] = useState<any[]>([]);
-    const [selectedModels, setSelectedModels] = useState<string[]>(['gpt-4o']);
+    const [selectedModels, setSelectedModels] = useState<string[]>(['gpt-4o-mini', 'gemini-2-flash']);
     const [selectedPrompts, setSelectedPrompts] = useState<string[]>([]);
 
     useEffect(() => {
@@ -34,6 +35,7 @@ export default function NewCollectionPage() {
             if (brandResult.success && brandResult.brand) {
                 setBrandName(brandResult.brand.name || 'Your Brand');
                 setKeywords(brandResult.brand.keywords || []);
+                setCompetitorCount(brandResult.brand.competitors?.length || 0);
             }
 
             if (promptResult.success && promptResult.prompts) {
@@ -120,19 +122,60 @@ export default function NewCollectionPage() {
         );
     }
 
+    const hasComparisonPromptsSelected = availablePrompts.some(
+        p => selectedPrompts.includes(p.id) && p.template.includes('{competitor}')
+    );
+
+    const willGenerateQueries = availablePrompts.some(p => {
+        if (!selectedPrompts.includes(p.id)) return false;
+        const needsCompetitor = p.template.includes('{competitor}');
+        return !needsCompetitor || (needsCompetitor && competitorCount > 0);
+    });
+
+    const isStartDisabled = starting || selectedModels.length === 0 || selectedPrompts.length === 0 || !willGenerateQueries || keywords.length === 0;
+
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">New Collection</h1>
-                <p className="text-muted-foreground">
-                    Start a new data collection run for {brandName}
-                </p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">New Collection</h1>
+                    <p className="text-muted-foreground">
+                        Select models and prompts to evaluate your brand
+                    </p>
+                </div>
+                <Button
+                    onClick={handleStart}
+                    disabled={isStartDisabled}
+                >
+                    {starting ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Starting...
+                        </>
+                    ) : (
+                        'Start Collection'
+                    )}
+                </Button>
             </div>
 
             {error && (
                 <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>{error}</AlertDescription>
+                </Alert>
+            )}
+
+            {hasComparisonPromptsSelected && competitorCount === 0 && (
+                <Alert className="border-amber-500 bg-amber-50">
+                    <AlertCircle className="h-4 w-4 text-amber-600" />
+                    <AlertDescription className="text-amber-800">
+                        Some of your selected prompts require competitors to compare against.
+                        Please add competitors in{' '}
+                        <a href="/settings/brand" className="font-bold underline">
+                            Brand Settings
+                        </a>{' '}
+                        to enable comparison queries.
+                    </AlertDescription>
                 </Alert>
             )}
 

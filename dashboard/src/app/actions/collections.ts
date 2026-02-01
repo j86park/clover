@@ -24,10 +24,10 @@ export async function startCollection(data: {
             return { success: false, error: 'Not authenticated' };
         }
 
-        // Get the user's brand
+        // Get the user's brand and competitors
         const { data: brand, error: brandError } = await supabase
             .from('brands')
-            .select('id, name, keywords')
+            .select('id, name, keywords, competitors(id)')
             .eq('user_id', user.id)
             .maybeSingle();
 
@@ -41,6 +41,36 @@ export async function startCollection(data: {
                 success: false,
                 error: 'Please add tracking keywords in Brand Settings before starting a collection'
             };
+        }
+
+        // Validate prompt/competitor logic if promptIds are provided
+        if (data.promptIds && data.promptIds.length > 0) {
+            const { data: prompts } = await supabase
+                .from('prompts')
+                .select('id, template')
+                .in('id', data.promptIds);
+
+            if (prompts) {
+                const competitorsCount = brand.competitors?.length || 0;
+                let willGenerateQueries = false;
+
+                for (const p of prompts) {
+                    const needsCompetitor = p.template.includes('{competitor}');
+                    if (!needsCompetitor || (needsCompetitor && competitorsCount > 0)) {
+                        willGenerateQueries = true;
+                        break;
+                    }
+                }
+
+                if (!willGenerateQueries) {
+                    return {
+                        success: false,
+                        error: competitorsCount === 0
+                            ? 'The selected prompts require competitors to compare against. Please add competitors in Brand Settings first.'
+                            : 'No valid queries could be generated with the selected prompts.'
+                    };
+                }
+            }
         }
 
         // 1. Create collection record immediately so it shows up in the UI
