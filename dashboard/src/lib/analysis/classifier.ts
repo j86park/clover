@@ -55,17 +55,29 @@ const EARNED_MEDIA_DOMAINS = new Set([
 ]);
 
 /**
+ * Helper to normalize a domain by removing protocol, www., and trailing slash
+ */
+function normalizeDomain(domain: string): string {
+    return domain
+        .toLowerCase()
+        .trim()
+        .replace(/^https?:\/\//, '')
+        .replace(/^www\./, '')
+        .replace(/\/$/, '');
+}
+
+/**
  * Classify a source domain
  */
 export function classifySource(
     domain: string,
     context: ClassificationContext
 ): SourceType {
-    const normalizedDomain = domain.toLowerCase().replace(/^www\./, '');
+    const normalizedDomain = normalizeDomain(domain);
 
     // Check if owned (matches brand domain)
     if (context.brandDomain) {
-        const normalizedBrand = context.brandDomain.toLowerCase().replace(/^www\./, '');
+        const normalizedBrand = normalizeDomain(context.brandDomain);
         if (normalizedDomain === normalizedBrand || normalizedDomain.endsWith(`.${normalizedBrand}`)) {
             return 'owned';
         }

@@ -20,15 +20,28 @@ export default function NewCollectionPage() {
     const [success, setSuccess] = useState(false);
     const [brandName, setBrandName] = useState('');
     const [keywords, setKeywords] = useState<string[]>([]);
+    const [availablePrompts, setAvailablePrompts] = useState<any[]>([]);
     const [selectedModels, setSelectedModels] = useState<string[]>(['gpt-4o']);
+    const [selectedPrompts, setSelectedPrompts] = useState<string[]>([]);
 
     useEffect(() => {
         async function loadData() {
-            const brandResult = await getBrand();
+            const [brandResult, promptResult] = await Promise.all([
+                getBrand(),
+                getAvailablePrompts()
+            ]);
+
             if (brandResult.success && brandResult.brand) {
                 setBrandName(brandResult.brand.name || 'Your Brand');
                 setKeywords(brandResult.brand.keywords || []);
             }
+
+            if (promptResult.success && promptResult.prompts) {
+                setAvailablePrompts(promptResult.prompts);
+                // Select all prompts by default
+                setSelectedPrompts(promptResult.prompts.map((p: any) => p.id));
+            }
+
             setLoading(false);
         }
         loadData();
@@ -42,9 +55,22 @@ export default function NewCollectionPage() {
         );
     };
 
+    const handlePromptToggle = (promptId: string) => {
+        setSelectedPrompts(prev =>
+            prev.includes(promptId)
+                ? prev.filter(id => id !== promptId)
+                : [...prev, promptId]
+        );
+    };
+
     const handleStart = async () => {
         if (selectedModels.length === 0) {
             setError('Please select at least one model');
+            return;
+        }
+
+        if (selectedPrompts.length === 0) {
+            setError('Please select at least one prompt');
             return;
         }
 
@@ -58,6 +84,7 @@ export default function NewCollectionPage() {
 
         const result = await startCollection({
             models: selectedModels,
+            promptIds: selectedPrompts,
         });
 
         setStarting(false);
@@ -109,11 +136,78 @@ export default function NewCollectionPage() {
                 </Alert>
             )}
 
+            <div className="grid gap-6 md:grid-cols-2">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Select Models</CardTitle>
+                        <CardDescription>
+                            Choose which LLM models to query
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        {Object.entries(AVAILABLE_MODELS).map(([key, model]) => (
+                            <div key={key} className="flex items-center space-x-2">
+                                <Checkbox
+                                    id={`model-${key}`}
+                                    checked={selectedModels.includes(key)}
+                                    onCheckedChange={() => handleModelToggle(key)}
+                                />
+                                <Label
+                                    htmlFor={`model-${key}`}
+                                    className="text-sm font-normal cursor-pointer flex-1"
+                                >
+                                    <span className="font-medium">{model.name}</span>
+                                    <span className="text-muted-foreground ml-2">
+                                        ({model.provider})
+                                    </span>
+                                </Label>
+                            </div>
+                        ))}
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Select Prompts</CardTitle>
+                        <CardDescription>
+                            Choose the templates to run
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        {availablePrompts.length > 0 ? (
+                            availablePrompts.map((prompt) => (
+                                <div key={prompt.id} className="flex items-start space-x-2 pb-2 border-b last:border-0">
+                                    <Checkbox
+                                        id={`prompt-${prompt.id}`}
+                                        checked={selectedPrompts.includes(prompt.id)}
+                                        onCheckedChange={() => handlePromptToggle(prompt.id)}
+                                        className="mt-1"
+                                    />
+                                    <div className="flex-1 space-y-1">
+                                        <Label
+                                            htmlFor={`prompt-${prompt.id}`}
+                                            className="text-sm font-medium leading-none cursor-pointer capitalize"
+                                        >
+                                            {prompt.category}: {prompt.intent}
+                                        </Label>
+                                        <p className="text-xs text-muted-foreground line-clamp-2 italic">
+                                            "{prompt.template}"
+                                        </p>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-sm text-muted-foreground">No prompts found in database.</p>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
+
             <Card>
                 <CardHeader>
                     <CardTitle>Tracking Keywords</CardTitle>
                     <CardDescription>
-                        These keywords will be used to generate prompts for LLMs
+                        Used to populate variable templates like {'{brand}'} and {'{category}'}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -140,39 +234,10 @@ export default function NewCollectionPage() {
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Select Models</CardTitle>
-                    <CardDescription>
-                        Choose which LLM models to query (more models = more comprehensive data)
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                    {Object.entries(AVAILABLE_MODELS).map(([key, model]) => (
-                        <div key={key} className="flex items-center space-x-2">
-                            <Checkbox
-                                id={key}
-                                checked={selectedModels.includes(key)}
-                                onCheckedChange={() => handleModelToggle(key)}
-                            />
-                            <Label
-                                htmlFor={key}
-                                className="text-sm font-normal cursor-pointer flex-1"
-                            >
-                                <span className="font-medium">{model.name}</span>
-                                <span className="text-muted-foreground ml-2">
-                                    ({model.provider})
-                                </span>
-                            </Label>
-                        </div>
-                    ))}
-                </CardContent>
-            </Card>
-
             <div className="flex gap-3">
                 <Button
                     onClick={handleStart}
-                    disabled={starting || keywords.length === 0}
+                    disabled={starting || keywords.length === 0 || selectedPrompts.length === 0}
                     className="flex-1"
                 >
                     {starting ? (

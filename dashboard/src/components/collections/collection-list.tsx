@@ -1,14 +1,41 @@
+'use client';
+
+import { useState, useTransition } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Collection } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
+import { Trash2, Loader2, ExternalLink } from 'lucide-react';
+import { deleteCollection } from '@/app/actions/collections';
 
 interface CollectionListProps {
     collections: (Collection & { brands?: { name: string } })[];
 }
 
-export function CollectionList({ collections }: CollectionListProps) {
+export function CollectionList({ collections: initialCollections }: CollectionListProps) {
+    const [collections, setCollections] = useState(initialCollections);
+    const [isPending, startTransition] = useTransition();
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+
+    const handleDelete = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this collection and all its results?')) {
+            return;
+        }
+
+        setDeletingId(id);
+        startTransition(async () => {
+            const result = await deleteCollection(id);
+            if (result.success) {
+                setCollections(prev => prev.filter(c => c.id !== id));
+            } else {
+                alert(result.error || 'Failed to delete collection');
+            }
+            setDeletingId(null);
+        });
+    };
+
     if (collections.length === 0) {
         return (
             <Card>
@@ -35,12 +62,12 @@ export function CollectionList({ collections }: CollectionListProps) {
                                 <th className="px-6 py-3">Date</th>
                                 <th className="px-6 py-3">Brand</th>
                                 <th className="px-6 py-3">Status</th>
-                                <th className="px-6 py-3">Actions</th>
+                                <th className="px-6 py-3 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {collections.map((collection) => (
-                                <tr key={collection.id} className="border-b hover:bg-muted/50">
+                                <tr key={collection.id} className="border-b hover:bg-muted/50 transition-colors">
                                     <td className="px-6 py-4 font-medium">
                                         {formatDistanceToNow(new Date(collection.created_at), { addSuffix: true })}
                                     </td>
@@ -62,13 +89,29 @@ export function CollectionList({ collections }: CollectionListProps) {
                                             {collection.status}
                                         </Badge>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <Link
-                                            href={`/collections/${collection.id}`}
-                                            className="font-medium text-primary hover:underline"
-                                        >
-                                            View
-                                        </Link>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <Link href={`/collections/${collection.id}`}>
+                                                <Button variant="ghost" size="sm" className="h-8 gap-1">
+                                                    <ExternalLink className="h-3.5 w-3.5" />
+                                                    View
+                                                </Button>
+                                            </Link>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                onClick={() => handleDelete(collection.id)}
+                                                disabled={deletingId === collection.id}
+                                            >
+                                                {deletingId === collection.id ? (
+                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                ) : (
+                                                    <Trash2 className="h-4 w-4" />
+                                                )}
+                                                <span className="sr-only">Delete</span>
+                                            </Button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
