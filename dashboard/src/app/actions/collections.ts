@@ -88,13 +88,26 @@ export async function getAvailablePrompts() {
     try {
         const supabase = await createClient();
 
-        const { data: prompts, error } = await supabase
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+        // If not logged in, we can still show global prompts (or return error)
+        // For now, let's fetch based on user if available, otherwise just global
+        let query = supabase
             .from('prompts')
-            .select('id, category, intent, template')
-            .eq('is_active', true)
+            .select('id, category, intent, template, user_id')
+            .eq('is_active', true);
+
+        if (user) {
+            query = query.or(`user_id.is.null,user_id.eq.${user.id}`);
+        } else {
+            query = query.is('user_id', null);
+        }
+
+        const { data: prompts, error } = await query
             .order('category', { ascending: true });
 
         if (error) {
+            console.error('Error fetching prompts:', error);
             return { success: false, error: 'Failed to fetch prompts' };
         }
 
