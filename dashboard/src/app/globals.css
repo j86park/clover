@@ -50,27 +50,46 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: 0 0% 4%;
-    --foreground: 0 0% 93%;
-    --card: 0 0% 4%;
-    --card-foreground: 0 0% 93%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
+    --background: 153 73% 2%;
+    --foreground: 0 0% 100%;
+    --card: 153 73% 2%;
+    --card-foreground: 0 0% 100%;
+    --primary: 160 100% 48%;
+    --primary-foreground: 153 73% 2%;
+    --secondary: 160 57% 7%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 160 57% 7%;
     --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 160 100% 48%;
+    --accent-foreground: 153 73% 2%;
     --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 212 95% 64%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 160 57% 12%;
+    --input: 160 57% 12%;
+    --ring: 160 100% 48%;
   }
 }
 
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
+}
+
+@utility bg-clover-base {
+  background-color: #010805;
+  background-image:
+    radial-gradient(circle at 50% 10%, #062016 0%, transparent 40%),
+    radial-gradient(circle at 0% 100%, #021a10 0%, transparent 30%);
+  position: relative;
+  min-height: 100vh;
+}
+
+@utility bg-clover-base::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(0, 245, 160, 0.03) 1px, transparent 0);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
 }
