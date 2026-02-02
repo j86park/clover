@@ -55,6 +55,36 @@ export async function authenticateApiKey(request: Request): Promise<ApiKeyRecord
 }
 
 /**
+ * Log API usage to the database (fire and forget).
+ */
+export async function logApiUsage(
+    userId: string,
+    keyId: string,
+    endpoint: string,
+    status: number,
+    responseTimeMs: number
+) {
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    // Fire and forget
+    supabase
+        .from('api_usage')
+        .insert({
+            user_id: userId,
+            key_id: keyId,
+            endpoint,
+            status,
+            response_time_ms: responseTimeMs,
+        })
+        .then(({ error }) => {
+            if (error) console.error('Failed to log API usage:', error);
+        });
+}
+
+/**
  * Check if the key record has the required permission.
  */
 export function hasPermission(keyRecord: ApiKeyRecord, requiredPermission: string): boolean {

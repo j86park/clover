@@ -1,20 +1,18 @@
 # GSD State
 
-## Current Position
-- **Milestone**: M1 — MVP Dashboard
-- **Phase**: Phase 13 (Competitor Management & Validation) — **Complete** ✅
-- **Status**: Build Error Fixed 🛠️
+## 2026-02-01: Phases 14-17 — UI & API Excellence
 
-### Next Session
-- Monitor UI feedback on competitor management.
-- Explore batch processing optimizations.
+### Session Summary
+- **Phase 14**: Implemented auto-reloading for collections using Supabase Realtime.
+- **Phase 15**: Added deep-linking from collection details to filtered analysis bench.
+- **Phase 16**: Fixed critical API metric discrepancy by aligning with production schema.
+- **Phase 17**: Replaced mock data in API Usage statistics with real-time tracking.
 
----
-
-## Last Action
-- Implemented Phase 16: Fix API Metric Discrepancy (V2).
-- Refactored API route to fetch real data from the latest completed collection.
-- Aligned API column names with the database schema and removed all placeholder logic.
+### Key Decisions
+- **Schema Resolution**: Performed a clean recreation of the `api_usage` table to resolve a mismatch with pre-existing legacy structures.
+- **Usage Logging**: Implemented a fire-and-forget logging pattern in the API authentication layer to capture request metadata without impacting latency.
+- **Server Components**: Leveraged Next.js Server Components for the Usage page to ensure data freshness while keeping client bundles small.
+-time dashboard updates.
 
 ## Milestone Status
-Phases 1-16: ✅ Complete (Production Ready)
+Phases 1-17: ✅ Complete (Production Ready)

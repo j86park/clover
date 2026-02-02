@@ -1,14 +1,20 @@
 import { NextResponse } from 'next/server';
-import { authenticateApiKey, hasPermission, AuthError } from '@/lib/auth/api-key';
+import { authenticateApiKey, hasPermission, AuthError, logApiUsage } from '@/lib/auth/api-key';
 import { createClient } from '@supabase/supabase-js';
 
+
 export async function GET(request: Request) {
+    const startTime = Date.now();
+    let keyRecord: any = null;
+
     try {
         // Authenticate the API key
-        const keyRecord = await authenticateApiKey(request);
+        keyRecord = await authenticateApiKey(request);
 
         // Check for required permission
         if (!hasPermission(keyRecord, 'metrics:read')) {
+            const duration = Date.now() - startTime;
+            logApiUsage(keyRecord.user_id, keyRecord.id, '/api/v1/metrics', 403, duration);
             return NextResponse.json(
                 { error: 'Forbidden', message: 'Missing required permission: metrics:read' },
                 { status: 403 }
@@ -29,6 +35,8 @@ export async function GET(request: Request) {
             .single();
 
         if (brandError || !brand) {
+            const duration = Date.now() - startTime;
+            logApiUsage(keyRecord.user_id, keyRecord.id, '/api/v1/metrics', 404, duration);
             return NextResponse.json(
                 { error: 'Not Found', message: 'No brand found for this user' },
                 { status: 404 }
@@ -46,6 +54,8 @@ export async function GET(request: Request) {
             .maybeSingle();
 
         if (collError || !collection) {
+            const duration = Date.now() - startTime;
+            logApiUsage(keyRecord.user_id, keyRecord.id, '/api/v1/metrics', 404, duration);
             return NextResponse.json(
                 { error: 'Not Found', message: 'No completed collections found for this brand' },
                 { status: 404 }
@@ -59,6 +69,8 @@ export async function GET(request: Request) {
             .eq('collection_id', collection.id);
 
         if (metricsError || !allMetrics) {
+            const duration = Date.now() - startTime;
+            logApiUsage(keyRecord.user_id, keyRecord.id, '/api/v1/metrics', 500, duration);
             return NextResponse.json(
                 { error: 'Internal Server Error', message: 'Failed to fetch metrics results' },
                 { status: 500 }
@@ -97,8 +109,15 @@ export async function GET(request: Request) {
             competitors: competitorMetrics,
         };
 
+        const duration = Date.now() - startTime;
+        logApiUsage(keyRecord.user_id, keyRecord.id, '/api/v1/metrics', 200, duration);
         return NextResponse.json(response);
     } catch (error) {
+        const duration = Date.now() - startTime;
+        if (keyRecord) {
+            logApiUsage(keyRecord.user_id, keyRecord.id, '/api/v1/metrics', (error as AuthError).status || 500, duration);
+        }
+
         // Handle authentication errors
         if ((error as AuthError).status) {
             const authError = error as AuthError;

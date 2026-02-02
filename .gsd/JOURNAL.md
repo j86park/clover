@@ -61,13 +61,15 @@
 
 ---
 
-## 2026-02-01: Phase 14 — Auto-Reload for Collections
+## 2026-02-01: Phases 14-17 — UI & API Excellence
 
 ### Session Summary
-- Implemented auto-reloading for the collections page using Supabase Realtime.
-- Enabled realtime publication for the `collections` table.
-- Modified `CollectionList` to subscribe to status updates and trigger a UI refresh and server data refresh (`router.refresh()`).
+- **Phase 14**: Implemented auto-reloading for collections using Supabase Realtime.
+- **Phase 15**: Added deep-linking from collection details to filtered analysis bench.
+- **Phase 16**: Fixed critical API metric discrepancy by aligning with production schema.
+- **Phase 17**: Replaced mock data in API Usage statistics with real-time tracking and logging.
 
 ### Key Decisions
-- **Supabase Realtime**: Used for immediate UI feedback without the overhead of periodic polling.
+- **Usage Logging**: Implemented a fire-and-forget logging pattern in the API authentication layer to capture request metadata without impacting latency.
+- **Server Components**: Leveraged Next.js Server Components for the Usage page to ensure data freshness while keeping client bundles small.
 - **router.refresh()**: Used in combination with local state updates to ensure the entire page's server-side data stays in sync when a run completes.
