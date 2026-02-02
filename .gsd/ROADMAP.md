@@ -167,3 +167,16 @@
 - `/api/v1/metrics` JSON endpoint for ASoV, AIGVR, Sentiment, Competitors ✓
 - Scoped permissions (`metrics:read`) ✓
 - Usage tracking (`last_used_at`) ✓
+
+---
+
+### Phase 13: Technical Audit & Production Hardening
+**Status**: 🚧 In Progress
+**Objective**: Comprehensive audit of codebase, structural refactoring, and documentation overhaul.
+
+**Deliverables:**
+- [ ] Immediate deletion of redundant/dead files
+- [ ] Structural reorganization (scripts consolidated)
+- [ ] Enhanced root-level configuration (.gitignore, linting)
+- [ ] High-fidelity README.md with system architecture
+- [ ] Code quality polish (refactoring smells identified)
