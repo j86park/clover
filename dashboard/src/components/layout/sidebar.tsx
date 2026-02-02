@@ -57,7 +57,7 @@ export function Sidebar() {
             <div className="flex h-full flex-col w-full">
                 {/* Logo */}
                 <div className="flex h-16 items-center border-b px-6">
-                    <h1 className="text-xl font-bold">LLM SEO Dashboard</h1>
+                    <h1 className="text-xl font-black tracking-tighter uppercase italic">CLOVER</h1>
                 </div>
 
                 {/* Navigation */}

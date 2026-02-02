@@ -1,5 +1,13 @@
 # JOURNAL.md — Development Log
 
+## 2026-02-02: Tailwind CSS v4 Linter Fix
+- **Context**: "Unknown at rule @theme" warning in `globals.css`.
+- **Action**: Created `.vscode/settings.json` to ignore `unknownAtRules` and simplified `@theme inline` to `@theme`.
+- **Reasoning**: Tailwind v4 uses new at-rules that standard CSS linters don't yet recognize. Removing `inline` aligns with standard boilerplate and reduces parser ambiguity.
+- **Outcome**: Linter warnings suppressed, build continues to pass.
+
+---
+
 ## Format
 
 ```
