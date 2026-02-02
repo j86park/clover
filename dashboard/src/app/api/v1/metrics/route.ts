@@ -35,50 +35,63 @@ export async function GET(request: Request) {
             );
         }
 
-        // Get the latest metrics for this brand
-        const { data: metrics, error: metricsError } = await supabase
+        // Get the latest completed collection for this brand
+        const { data: collection, error: collError } = await supabase
+            .from('collections')
+            .select('id')
+            .eq('brand_id', brand.id)
+            .eq('status', 'completed')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+        if (collError || !collection) {
+            return NextResponse.json(
+                { error: 'Not Found', message: 'No completed collections found for this brand' },
+                { status: 404 }
+            );
+        }
+
+        // Get all metrics for this collection (brand + competitors)
+        const { data: allMetrics, error: metricsError } = await supabase
             .from('metrics')
             .select('*')
-            .eq('brand_id', brand.id)
-            .order('calculated_at', { ascending: false })
-            .limit(1)
-            .single();
+            .eq('collection_id', collection.id);
 
-        // Get competitors for this brand
-        const { data: competitors } = await supabase
-            .from('competitors')
-            .select('name')
-            .eq('brand_id', brand.id);
-
-        // Get competitor metrics if available
-        const competitorMetrics = [];
-        if (competitors && competitors.length > 0) {
-            for (const comp of competitors) {
-                // For now, return placeholder ASoV for competitors
-                // In a full implementation, this would calculate from analysis data
-                competitorMetrics.push({
-                    name: comp.name,
-                    asov: Math.round(Math.random() * 30 * 10) / 10, // Placeholder
-                });
-            }
+        if (metricsError || !allMetrics) {
+            return NextResponse.json(
+                { error: 'Internal Server Error', message: 'Failed to fetch metrics results' },
+                { status: 500 }
+            );
         }
+
+        // Identify the target brand metric
+        const brandMetric = allMetrics.find(m => m.brand_id === brand.id);
+
+        // Identify competitor metrics
+        const competitorMetrics = allMetrics
+            .filter(m => m.brand_id !== brand.id)
+            .map(m => ({
+                name: m.brand_name,
+                asov: m.asov ?? 0,
+                aigvr: m.aigvr ?? 0,
+            }));
 
         // Build the response
         const response = {
             brand: brand.name,
-            timestamp: new Date().toISOString(),
+            timestamp: brandMetric?.created_at || new Date().toISOString(),
             metrics: {
-                asov: metrics?.answer_share_of_voice ?? 0,
-                aigvr: metrics?.visibility_rate ?? 0,
+                asov: brandMetric?.asov ?? 0,
+                aigvr: brandMetric?.aigvr ?? 0,
                 sentiment: {
-                    positive: metrics?.sentiment_positive ?? 0,
-                    neutral: metrics?.sentiment_neutral ?? 0,
-                    negative: metrics?.sentiment_negative ?? 0,
+                    score: brandMetric?.sentiment_score ?? 0,
                 },
                 authority: {
-                    owned: metrics?.authority_owned ?? 0,
-                    earned: metrics?.authority_earned ?? 0,
-                    external: metrics?.authority_external ?? 0,
+                    score: brandMetric?.authority_score ?? 0,
+                    owned: brandMetric?.owned_citations ?? 0,
+                    earned: brandMetric?.earned_citations ?? 0,
+                    external: brandMetric?.external_citations ?? 0,
                 },
             },
             competitors: competitorMetrics,
