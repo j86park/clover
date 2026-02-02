@@ -75,7 +75,7 @@ body {
   color: hsl(var(--foreground));
 }
 
-@utility bg-clover-base {
+.bg-clover-base {
   background-color: #010805;
   background-image:
     radial-gradient(circle at 50% 10%, #062016 0%, transparent 40%),
@@ -84,7 +84,7 @@ body {
   min-height: 100vh;
 }
 
-@utility bg-clover-base::before {
+.bg-clover-base::before {
   content: "";
   position: absolute;
   inset: 0;
