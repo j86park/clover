@@ -12,11 +12,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     const isAuthPage = pathname === '/login' || pathname === '/signup';
 
     if (isAuthPage) {
-        return <main className="h-screen w-screen overflow-hidden bg-background">{children}</main>;
+        return <main className="h-screen w-screen overflow-hidden bg-transparent">{children}</main>;
     }
 
     return (
-        <div className="flex h-screen w-full bg-background overflow-hidden">
+        <div className="flex h-screen w-full bg-transparent overflow-hidden">
             {/* Sidebar container - reserves space even during dynamic load */}
             <div className="hidden md:block w-64 shrink-0">
                 <Sidebar />
