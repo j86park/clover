@@ -192,3 +192,16 @@
 - [x] Corrected Emerald theme blueprint based on screenshots
 - [x] Actionable CSS/Tailwind snippets for mesh background and components
 - [x] App-wide implementation of Deep Emerald visual foundation
+
+---
+
+### Phase 15: Remotion Video Showcase
+**Status**: 🚧 In Progress
+**Objective**: Create a professional video demonstration of the Clover dashboard using Remotion
+
+**Deliverables:**
+- Remotion project setup in `video-showcase/` directory
+- Stylized intro/outro animations with emerald branding
+- Hybrid feature showcase scenes (stylized + dashboard screenshots)
+- Data collection, analysis, dashboard, and testing scenes
+- Rendered 60-90 second showcase video
