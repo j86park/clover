@@ -1,3 +1,4 @@
+import React from 'react';
 import { Composition } from 'remotion';
 import { CloverShowcase } from './Video';
 

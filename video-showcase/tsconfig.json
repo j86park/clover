@@ -2,7 +2,7 @@
     "compilerOptions": {
         "target": "ES2022",
         "module": "ESNext",
-        "moduleResolution": "bundler",
+        "moduleResolution": "node",
         "esModuleInterop": true,
         "strict": true,
         "jsx": "react-jsx",
@@ -16,7 +16,12 @@
             "@/*": [
                 "src/*"
             ]
-        }
+        },
+        "types": [
+            "node",
+            "react",
+            "react-dom"
+        ]
     },
     "include": [
         "src/**/*"

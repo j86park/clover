@@ -1,3 +1,4 @@
+import React from 'react';
 import { AbsoluteFill, Sequence } from 'remotion';
 import { IntroScene } from './scenes/IntroScene';
 import { ProblemScene } from './scenes/ProblemScene';

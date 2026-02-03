@@ -1,3 +1,4 @@
+import React from 'react';
 import { AbsoluteFill, useCurrentFrame, interpolate } from 'remotion';
 import { theme } from '../styles/theme';
 
