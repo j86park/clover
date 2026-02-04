@@ -1,5 +1,5 @@
 import { inngest } from "../client";
-import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import { queryLLM } from "@/lib/openrouter/client";
 import { AVAILABLE_MODELS, type ModelKey } from "@/lib/openrouter/models";
 import { generatePromptInstances } from "@/lib/collector/generator";
@@ -15,11 +15,22 @@ export const collectionStart = inngest.createFunction(
     { id: "collection-start", name: "Start Data Collection" },
     { event: "collection.start" },
     async ({ event, step }) => {
-        const { brandId, models, promptIds } = event.data;
-        const supabase = await createClient();
+        const { brandId, models, promptIds, collectionId: existingCollectionId } = event.data;
+        const supabase = createServiceClient();
 
-        // 1. Create collection record (Step ensures this is tracked)
+        // 1. Get or Create collection record
         const collection = await step.run("initialize-collection", async () => {
+            // If we already have an ID (from the server action), just fetch it
+            if (existingCollectionId) {
+                const { data, error } = await supabase
+                    .from('collections')
+                    .select('*')
+                    .eq('id', existingCollectionId)
+                    .single();
+                if (data) return data;
+            }
+
+            // Otherwise, create a new one (legacy/fallback)
             const { data, error } = await supabase
                 .from('collections')
                 .insert({

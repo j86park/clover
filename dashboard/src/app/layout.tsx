@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Sidebar } from "@/components/layout/sidebar";
-import { Header } from "@/components/layout/header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,6 +17,8 @@ export const metadata: Metadata = {
   description: "Analytics dashboard for LLM-based SEO metrics",
 };
 
+import { AppLayout } from "@/components/layout/app-layout";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,17 +27,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-clover-base`}
       >
-        <div className="flex h-screen">
-          <Sidebar />
-          <div className="flex flex-1 flex-col pl-64">
-            <Header />
-            <main className="flex-1 overflow-y-auto bg-background p-6">
-              {children}
-            </main>
-          </div>
-        </div>
+        <AppLayout>{children}</AppLayout>
       </body>
     </html>
   );

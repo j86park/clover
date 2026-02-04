@@ -1,32 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 0 0% 9%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 9%;
-  --primary: 222 47% 11%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222 47% 11%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 210 40% 96%;
-  --accent-foreground: 222 47% 11%;
+  --background: 160 84% 3%;
+  --foreground: 160 10% 98%;
+  --card: 160 84% 4%;
+  --card-foreground: 160 10% 98%;
+  --primary: 160 84% 45%;
+  --primary-foreground: 160 84% 2%;
+  --secondary: 160 30% 12%;
+  --secondary-foreground: 160 10% 98%;
+  --muted: 160 30% 12%;
+  --muted-foreground: 160 20% 65%;
+  --accent: 160 84% 45%;
+  --accent-foreground: 160 84% 2%;
   --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 222 47% 11%;
-  --radius: 0.5rem;
-  --chart-1: 220 70% 50%;
-  --chart-2: 160 60% 45%;
-  --chart-3: 30 80% 55%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 340 75% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 160 30% 15%;
+  --input: 160 30% 15%;
+  --ring: 160 84% 45%;
+  --radius: 1rem;
 }
 
-@theme inline {
+@theme {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
   --color-card: hsl(var(--card));
@@ -44,33 +39,17 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: 0 0% 4%;
-    --foreground: 0 0% 93%;
-    --card: 0 0% 4%;
-    --card-foreground: 0 0% 93%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 212 95% 64%;
-  }
 }
 
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
+  min-height: 100vh;
+}
+
+.bg-clover-base {
+  background-color: hsl(var(--background));
+  background-image:
+    radial-gradient(circle at 50% 0%, hsla(160, 84%, 45%, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, hsla(160, 84%, 45%, 0.1) 0%, transparent 30%);
 }

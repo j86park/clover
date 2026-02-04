@@ -144,3 +144,64 @@
 - Restore Analysis Page (create missing route and implement data view)
 - Verify data consistency between Dashboard and Analysis views
 - General UX polish (tooltips, loading states)
+### Phase 11: User Auth & Identity
+**Status**: ✅ Complete
+**Objective**: Implement secure authentication and multi-tenancy foundation
+
+**Deliverables:**
+- Supabase Auth integration (login/signup/logout) ✓
+- Middleware guard for protected routes ✓
+- RLS migration for brand ownership ✓
+- User-to-Brand profile resolution ✓
+
+---
+
+### Phase 12: Programmable API Access
+**Status**: ✅ Complete
+**Objective**: Enable real API key generation and programmatic JSON endpoints for terminal/script access to metrics
+
+**Deliverables:**
+- `api_keys` table with SHA-256 hashed key storage ✓
+- Key generation UI with secure one-time display ✓
+- API authentication middleware (`X-API-Key` header) ✓
+- `/api/v1/metrics` JSON endpoint for ASoV, AIGVR, Sentiment, Competitors ✓
+- Scoped permissions (`metrics:read`) ✓
+- Usage tracking (`last_used_at`) ✓
+
+---
+
+### Phase 13: Technical Audit & Production Hardening
+**Status**: ✅ Complete
+**Objective**: Comprehensive audit of codebase, structural refactoring, and documentation overhaul.
+
+**Deliverables:**
+- [x] Immediate deletion of redundant/dead files
+- [x] Structural reorganization (scripts consolidated)
+- [x] Enhanced root-level configuration (.gitignore, linting)
+- [x] High-fidelity README.md with system architecture
+- [x] Code quality polish (refactoring smells identified)
+
+---
+
+### Phase 14: Aesthetic & Technical Blueprinting
+**Status**: ✅ Complete
+**Objective**: Perform a technical and aesthetic teardown of cloverlabs.ai to replicate its professional aesthetic.
+
+**Deliverables:**
+- [x] Design Audit & Implementation Guide
+- [x] Corrected Emerald theme blueprint based on screenshots
+- [x] Actionable CSS/Tailwind snippets for mesh background and components
+- [x] App-wide implementation of Deep Emerald visual foundation
+
+---
+
+### Phase 15: Remotion Video Showcase
+**Status**: 🚧 In Progress
+**Objective**: Create a professional video demonstration of the Clover dashboard using Remotion
+
+**Deliverables:**
+- Remotion project setup in `video-showcase/` directory
+- Stylized intro/outro animations with emerald branding
+- Hybrid feature showcase scenes (stylized + dashboard screenshots)
+- Data collection, analysis, dashboard, and testing scenes
+- Rendered 60-90 second showcase video

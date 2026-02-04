@@ -1,33 +1,77 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Key, Trash2 } from 'lucide-react';
-import Link from 'next/link';
-
-// Mock data for now - will be replaced with API calls
-const mockApiKeys = [
-    {
-        id: '1',
-        name: 'Production API Key',
-        key_prefix: 'clv_abc1...',
-        is_active: true,
-        created_at: '2026-01-15T10:00:00Z',
-        last_used_at: '2026-01-22T09:30:00Z',
-        permissions: ['read', 'write'],
-    },
-    {
-        id: '2',
-        name: 'Development Key',
-        key_prefix: 'clv_dev2...',
-        is_active: true,
-        created_at: '2026-01-18T14:00:00Z',
-        last_used_at: null,
-        permissions: ['read'],
-    },
-];
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Plus, Key, Trash2, Copy, Check, AlertTriangle } from 'lucide-react';
+import { generateApiKey, listApiKeys, revokeApiKey, ApiKey } from '@/app/actions/api-keys';
 
 export default function ApiKeysPage() {
+    const [keys, setKeys] = useState<ApiKey[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [newKeyName, setNewKeyName] = useState('');
+    const [generatedKey, setGeneratedKey] = useState<string | null>(null);
+    const [copied, setCopied] = useState(false);
+    const [creating, setCreating] = useState(false);
+
+    const fetchKeys = useCallback(async () => {
+        const result = await listApiKeys();
+        if (result.success && result.keys) {
+            setKeys(result.keys);
+        }
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+        fetchKeys();
+    }, [fetchKeys]);
+
+    const handleCreateKey = async () => {
+        if (!newKeyName.trim()) return;
+
+        setCreating(true);
+        const result = await generateApiKey(newKeyName.trim());
+        setCreating(false);
+
+        if (result.success && result.rawKey) {
+            setGeneratedKey(result.rawKey);
+            fetchKeys(); // Refresh list
+        } else {
+            alert(result.error || 'Failed to create key');
+        }
+    };
+
+    const handleRevokeKey = async (keyId: string) => {
+        if (!confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) {
+            return;
+        }
+
+        const result = await revokeApiKey(keyId);
+        if (result.success) {
+            fetchKeys(); // Refresh list
+        } else {
+            alert(result.error || 'Failed to revoke key');
+        }
+    };
+
+    const copyToClipboard = async (text: string) => {
+        await navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    const closeModal = () => {
+        setShowCreateModal(false);
+        setNewKeyName('');
+        setGeneratedKey(null);
+        setCopied(false);
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -37,11 +81,94 @@ export default function ApiKeysPage() {
                         Manage your API keys for external integrations
                     </p>
                 </div>
-                <Button>
+                <Button onClick={() => setShowCreateModal(true)}>
                     <Plus className="mr-2 h-4 w-4" />
                     Create API Key
                 </Button>
             </div>
+
+            {/* Create Key Modal */}
+            {showCreateModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <Card className="w-full max-w-md mx-4">
+                        <CardHeader>
+                            <CardTitle>
+                                {generatedKey ? 'API Key Created!' : 'Create New API Key'}
+                            </CardTitle>
+                            {!generatedKey && (
+                                <CardDescription>
+                                    Give your key a name to help you identify it later
+                                </CardDescription>
+                            )}
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            {!generatedKey ? (
+                                <>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="keyName">Key Name</Label>
+                                        <Input
+                                            id="keyName"
+                                            placeholder="e.g., Production Monitor"
+                                            value={newKeyName}
+                                            onChange={(e) => setNewKeyName(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleCreateKey()}
+                                        />
+                                    </div>
+                                    <div className="flex gap-2 justify-end">
+                                        <Button variant="outline" onClick={closeModal}>
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            onClick={handleCreateKey}
+                                            disabled={!newKeyName.trim() || creating}
+                                        >
+                                            {creating ? 'Creating...' : 'Create Key'}
+                                        </Button>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                                        <div className="flex items-start gap-3">
+                                            <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                                            <div className="text-sm">
+                                                <p className="font-medium text-destructive">Copy your API key now!</p>
+                                                <p className="text-muted-foreground mt-1">
+                                                    This key will only be shown once. Store it securely.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Your API Key</Label>
+                                        <div className="flex gap-2">
+                                            <Input
+                                                readOnly
+                                                value={generatedKey}
+                                                className="font-mono text-sm"
+                                            />
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                onClick={() => copyToClipboard(generatedKey)}
+                                            >
+                                                {copied ? (
+                                                    <Check className="h-4 w-4 text-green-500" />
+                                                ) : (
+                                                    <Copy className="h-4 w-4" />
+                                                )}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <Button className="w-full" onClick={closeModal}>
+                                        Done
+                                    </Button>
+                                </>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
 
             <Card>
                 <CardHeader>
@@ -51,7 +178,11 @@ export default function ApiKeysPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {mockApiKeys.length === 0 ? (
+                    {loading ? (
+                        <div className="text-center py-12 text-muted-foreground">
+                            Loading...
+                        </div>
+                    ) : keys.length === 0 ? (
                         <div className="text-center py-12">
                             <Key className="mx-auto h-12 w-12 text-muted-foreground" />
                             <h3 className="mt-4 text-lg font-semibold">No API keys</h3>
@@ -66,13 +197,13 @@ export default function ApiKeysPage() {
                                     <TableHead>Name</TableHead>
                                     <TableHead>Key</TableHead>
                                     <TableHead>Permissions</TableHead>
+                                    <TableHead>Created</TableHead>
                                     <TableHead>Last Used</TableHead>
-                                    <TableHead>Status</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {mockApiKeys.map((key) => (
+                                {keys.map((key) => (
                                     <TableRow key={key.id}>
                                         <TableCell className="font-medium">{key.name}</TableCell>
                                         <TableCell className="font-mono text-sm">{key.key_prefix}</TableCell>
@@ -84,22 +215,20 @@ export default function ApiKeysPage() {
                                             ))}
                                         </TableCell>
                                         <TableCell>
+                                            {new Date(key.created_at).toLocaleDateString()}
+                                        </TableCell>
+                                        <TableCell>
                                             {key.last_used_at
                                                 ? new Date(key.last_used_at).toLocaleDateString()
                                                 : 'Never'}
                                         </TableCell>
-                                        <TableCell>
-                                            <Badge variant={key.is_active ? 'success' : 'destructive'}>
-                                                {key.is_active ? 'Active' : 'Revoked'}
-                                            </Badge>
-                                        </TableCell>
                                         <TableCell className="text-right">
-                                            <Link href={`/settings/usage?key=${key.id}`}>
-                                                <Button variant="ghost" size="sm">
-                                                    View Usage
-                                                </Button>
-                                            </Link>
-                                            <Button variant="ghost" size="sm" className="text-destructive">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-destructive hover:text-destructive"
+                                                onClick={() => handleRevokeKey(key.id)}
+                                            >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </TableCell>
@@ -117,16 +246,11 @@ export default function ApiKeysPage() {
                 </CardHeader>
                 <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                        Use your API key in requests by including it in the header:
+                        Use your API key in requests by including it in the X-API-Key header:
                     </p>
                     <pre className="bg-muted p-4 rounded-lg text-sm overflow-x-auto">
-                        Authorization: Bearer clv_your_api_key_here
-                    </pre>
-                    <p className="text-sm text-muted-foreground mt-4">
-                        Or use the X-API-Key header:
-                    </p>
-                    <pre className="bg-muted p-4 rounded-lg text-sm overflow-x-auto">
-                        X-API-Key: clv_your_api_key_here
+                        {`curl -H "X-API-Key: clv_live_your_key_here" \\
+     https://your-domain.com/api/v1/metrics`}
                     </pre>
                 </CardContent>
             </Card>

@@ -8,6 +8,7 @@ export interface Brand {
     name: string;
     domain?: string | null;
     keywords: string[] | null;
+    competitors?: Competitor[];
     created_at: string;
     updated_at: string;
 }
@@ -26,6 +27,7 @@ export interface Prompt {
     intent: string;
     template: string;
     is_active: boolean;
+    user_id?: string | null;
     created_at: string;
 }
 

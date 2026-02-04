@@ -34,6 +34,10 @@ export function generatePromptInstances(
         const needsCompetitor = templateVars.includes('competitor');
 
         if (needsCompetitor) {
+            if (competitors.length === 0) {
+                console.warn(`[Generator] Skipping prompt "${prompt.intent}" (ID: ${prompt.id}) because it requires competitors but brand has none.`);
+                continue;
+            }
             // Generate one instance per competitor
             for (const competitor of competitors) {
                 const variables = {

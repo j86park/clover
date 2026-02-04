@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 
 export function Header() {
     return (
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-6">
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/50 backdrop-blur-md px-6">
             <div className="flex-1">
                 {/* Breadcrumbs or page title can go here */}
             </div>

@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
-import { Key, BarChart3 } from 'lucide-react';
+import { Key, BarChart3, Building2 } from 'lucide-react';
 
 export default function SettingsPage() {
     return (
@@ -9,11 +9,25 @@ export default function SettingsPage() {
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
                 <p className="text-muted-foreground">
-                    Manage your API keys and view usage statistics
+                    Manage your brand, API keys and view usage statistics
                 </p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
+                <Link href="/settings/brand">
+                    <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
+                        <CardHeader className="flex flex-row items-center space-y-0">
+                            <Building2 className="h-5 w-5 mr-3 text-muted-foreground" />
+                            <CardTitle className="text-lg">Brand Settings</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">
+                                Configure your brand details and tracking keywords
+                            </p>
+                        </CardContent>
+                    </Card>
+                </Link>
+
                 <Link href="/settings/api-keys">
                     <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
                         <CardHeader className="flex flex-row items-center space-y-0">

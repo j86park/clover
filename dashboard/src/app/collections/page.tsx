@@ -7,15 +7,19 @@ import { createServerClient } from '@/lib/supabase';
 export default async function CollectionsPage() {
     const supabase = await createServerClient();
 
-    // Fetch collections with their brand names
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Fetch collections for brands owned by the user
     const { data: collections, error } = await supabase
         .from('collections')
         .select(`
             *,
-            brands (
-                name
+            brands!inner (
+                name,
+                user_id
             )
         `)
+        .eq('brands.user_id', user?.id)
         .order('created_at', { ascending: false });
 
     if (error) {
