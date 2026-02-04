@@ -150,6 +150,3 @@ export const TestingScene: React.FC = () => {
         </AbsoluteFill>
     );
 };
-
-    );
-};
