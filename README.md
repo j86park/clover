@@ -1,9 +1,9 @@
-# Clover — AI Visibility & Distribution Agent
+# AI Visibility & Distribution Agent
 
 Clover is a suite of AI agents designed to solve distribution in the age of generative AI. This dashboard is a core component that monitors brand narratives, citations, and visibility metrics across major LLMs.
 
 ## 🚀 Vision
-Built for modern marketing and growth teams, Clover tracks **what LLMs say about your brand**, moving beyond traditional SEO into the era of Generative Engine Optimization (GEO).
+Built for modern marketing and growth teams, tracks **what LLMs say about your brand**, moving beyond traditional SEO into the era of Generative Engine Optimization (GEO).
 
 ## ✨ Key Features
 - **Prompt Matrix Engine**: Automated orchestration across OpenAI, Anthropic, Google, and Perplexity via OpenRouter.
@@ -52,7 +52,3 @@ npx inngest-cli@latest dev
 - `/dashboard/src/app`: App router pages and API routes.
 - `/dashboard/src/lib`: Core logic (analysis, collector, metrics).
 - `/scripts`: System utilities and diagnostic tools.
-- `.gsd`: GSD Methodology state and planning.
-
-## 📄 License
-Private — Clover Labs.
