@@ -1,30 +1,40 @@
 ---
 phase: 15
 plan: 5
-gap_closure: true
+status: complete
 ---
 
-# Plan 15.5 Summary: Hybrid Feature Scenes (Actual Screenshots)
+# Plan 15.5 Summary: Hybrid Feature Scenes (Final)
 
 ## Completed Tasks
 
-### Task 1: Screenshot Integration ✓
-- Copied uploaded screenshots to `public/screenshots/`
-- `settings.png` mapped to Data Collection (config)
-- `analysis_claude.png` and `analysis_gpt.png` mapped to Analysis
-- `dashboard.png` mapped to Dashboard
-- `data-collection.png` (Collection Details) reserved for Testing/Dashboard
+### Screenshots Integrated ✓
+| Screenshot | Scene | Purpose |
+|------------|-------|---------|
+| `settings.png` | DataCollectionScene | LLM provider config |
+| `analysis_claude.png` | AnalysisScene | Claude analysis results |
+| `analysis_gpt.png` | AnalysisScene | GPT analysis results |
+| `external-citations.png` | AnalysisScene | Top citations modal |
+| `dashboard.png` | DashboardScene | Main metrics overview |
+| `api-usage.png` | DashboardScene | API call stats |
+| `api-keys.png` | DashboardScene | Key management |
+| `data-collection.png` | TestingScene | Collection details |
 
-### Task 2: DataCollectionScene (Updated) ✓
-- Now uses `settings.png` for literal dashboard view
-- Transition from stylized network graph to real UI
+### DataCollectionScene ✓
+- NetworkGraph → Settings screenshot transition
+- Ken Burns zoom on screenshot
 
-### Task 3: AnalysisScene (Updated) ✓
-- Now cycles through Claude and GPT analysis screenshots
-- Floating MetricCards for Mentions Found and Sentiment
+### AnalysisScene ✓
+- Text extraction animation
+- 3-phase screenshot cycle: Claude → GPT → Citations
+- Floating MetricCards
+
+### DashboardScene ✓
+- 3-phase screenshot cycle: Dashboard → API Usage → API Keys
+- MetricCards with animated counters
 
 ## Verification
 ```
 ✓ TypeScript compiles successfully
-✓ Images exist in public/screenshots/
+✓ All screenshots exist in public/screenshots/
 ```

@@ -118,9 +118,9 @@ export const AnalysisScene: React.FC = () => {
                     width: 1400,
                 }}
             >
-                {/* Phase A: Claude Analysis (250-350) */}
+                {/* Phase A: Claude Analysis (250-300) */}
                 <div style={{
-                    opacity: interpolate(frame, [250, 280, 340, 360], [0, 1, 1, 0]),
+                    opacity: interpolate(frame, [250, 270, 290, 310], [0, 1, 1, 0]),
                     position: 'absolute',
                     width: '100%',
                     borderRadius: 20,
@@ -130,9 +130,9 @@ export const AnalysisScene: React.FC = () => {
                     <Img src={staticFile('screenshots/analysis_claude.png')} style={{ width: '100%' }} />
                 </div>
 
-                {/* Phase B: GPT Analysis (360-450) */}
+                {/* Phase B: GPT Analysis (310-360) */}
                 <div style={{
-                    opacity: interpolate(frame, [350, 380], [0, 1]),
+                    opacity: interpolate(frame, [300, 320, 350, 370], [0, 1, 1, 0]),
                     position: 'absolute',
                     width: '100%',
                     borderRadius: 20,
@@ -140,6 +140,25 @@ export const AnalysisScene: React.FC = () => {
                     border: `2px solid ${theme.colors.background.tertiary}`,
                 }}>
                     <Img src={staticFile('screenshots/analysis_gpt.png')} style={{ width: '100%' }} />
+                </div>
+
+                {/* Phase C: External Citations (360-450) */}
+                <div style={{
+                    opacity: interpolate(frame, [360, 380], [0, 1]),
+                    position: 'absolute',
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                }}>
+                    <div style={{
+                        width: 600,
+                        borderRadius: 20,
+                        overflow: 'hidden',
+                        border: `2px solid ${theme.colors.background.tertiary}`,
+                        boxShadow: `0 40px 80px rgba(0,0,0,0.6)`,
+                    }}>
+                        <Img src={staticFile('screenshots/external-citations.png')} style={{ width: '100%' }} />
+                    </div>
                 </div>
 
                 {/* Floating Metrics on top */}
