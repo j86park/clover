@@ -1,170 +1,218 @@
 import React from 'react';
-import { AbsoluteFill, useCurrentFrame, interpolate } from 'remotion';
+import { AbsoluteFill, useCurrentFrame, interpolate, Img, staticFile } from 'remotion';
 import { theme } from '../styles/theme';
+import { NetworkGraph } from '../components/NetworkGraph';
+import { AnimatedText } from '../components/AnimatedText';
 
-const LLM_PROVIDERS = [
-    { name: 'OpenAI', color: '#10a37f' },
-    { name: 'Anthropic', color: '#d4a27f' },
-    { name: 'Google', color: '#4285f4' },
-    { name: 'Perplexity', color: '#20b2aa' },
+const LLM_NODES = [
+    { id: 'openai', label: 'GPT-4', x: 0.2, y: 0.25, color: '#10a37f' },
+    { id: 'anthropic', label: 'Claude', x: 0.8, y: 0.25, color: '#d4a27f' },
+    { id: 'google', label: 'Gemini', x: 0.2, y: 0.75, color: '#4285f4' },
+    { id: 'perplexity', label: 'Perplexity', x: 0.8, y: 0.75, color: '#20b2aa' },
 ];
 
 export const DataCollectionScene: React.FC = () => {
     const frame = useCurrentFrame();
 
-    // Center hub pulse
-    const hubScale = interpolate(
-        frame % 60,
-        [0, 30, 60],
-        [1, 1.05, 1],
-        { extrapolateRight: 'clamp' }
-    );
+    // Part 1: Stylized network (frames 0-200)
+    const networkOpacity = interpolate(frame, [0, 30, 180, 220], [0, 1, 1, 0], {
+        extrapolateLeft: 'clamp',
+        extrapolateRight: 'clamp',
+    });
+
+    // Part 2: Transition (frames 200-250)
+    const transitionProgress = interpolate(frame, [200, 250], [0, 1], {
+        extrapolateLeft: 'clamp',
+        extrapolateRight: 'clamp',
+    });
+
+    // Part 3: Dashboard visualization (frames 250-450)
+    const dashboardOpacity = interpolate(frame, [230, 280], [0, 1], {
+        extrapolateLeft: 'clamp',
+        extrapolateRight: 'clamp',
+    });
+
+    // Ken Burns effect for dashboard view
+    const kenBurnsScale = interpolate(frame, [250, 450], [1, 1.1], {
+        extrapolateLeft: 'clamp',
+        extrapolateRight: 'clamp',
+    });
+
+    const kenBurnsPan = interpolate(frame, [250, 450], [0, -30], {
+        extrapolateLeft: 'clamp',
+        extrapolateRight: 'clamp',
+    });
 
     return (
         <AbsoluteFill
             style={{
                 backgroundColor: theme.colors.background.primary,
-                justifyContent: 'center',
-                alignItems: 'center',
+                overflow: 'hidden',
             }}
         >
             {/* Title */}
             <div
                 style={{
                     position: 'absolute',
-                    top: 80,
-                    fontSize: 48,
-                    fontFamily: theme.fonts.heading,
-                    fontWeight: 600,
-                    color: theme.colors.text.primary,
+                    top: 60,
+                    width: '100%',
+                    textAlign: 'center',
+                    zIndex: 10,
                 }}
             >
-                Multi-LLM Data Collection
+                <AnimatedText
+                    text="Multi-LLM Data Collection"
+                    fontSize={48}
+                    color={theme.colors.text.primary}
+                    effect="fade"
+                    glow
+                />
             </div>
 
-            {/* Network visualization */}
-            <div style={{ position: 'relative', width: 800, height: 600 }}>
-                {/* Center hub */}
+            {/* Part 1: Stylized Network Graph */}
+            <div
+                style={{
+                    opacity: networkOpacity,
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                }}
+            >
+                <NetworkGraph
+                    nodes={LLM_NODES}
+                    width={800}
+                    height={500}
+                />
+            </div>
+
+            {/* Part 3: Dashboard Visualization (stylized since no screenshot) */}
+            <div
+                style={{
+                    opacity: dashboardOpacity,
+                    position: 'absolute',
+                    top: 140,
+                    left: '50%',
+                    transform: `translateX(-50%) scale(${kenBurnsScale}) translateY(${kenBurnsPan}px)`,
+                }}
+            >
+                {/* Stylized dashboard representation */}
                 <div
                     style={{
-                        position: 'absolute',
-                        left: '50%',
-                        top: '50%',
-                        transform: `translate(-50%, -50%) scale(${hubScale})`,
-                        width: 120,
-                        height: 120,
-                        borderRadius: '50%',
-                        backgroundColor: theme.colors.primary.DEFAULT,
-                        boxShadow: `0 0 60px ${theme.colors.primary.DEFAULT}`,
+                        width: 1400,
+                        height: 700,
+                        backgroundColor: theme.colors.background.secondary,
+                        borderRadius: 20,
+                        border: `2px solid ${theme.colors.background.tertiary}`,
+                        padding: 40,
                         display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        fontSize: 48,
+                        flexDirection: 'column',
+                        gap: 24,
                     }}
                 >
-                    🍀
-                </div>
-
-                {/* LLM Provider nodes */}
-                {LLM_PROVIDERS.map((provider, index) => {
-                    const angle = (index * 90 - 45) * (Math.PI / 180);
-                    const radius = 250;
-                    const x = Math.cos(angle) * radius;
-                    const y = Math.sin(angle) * radius;
-
-                    const nodeDelay = index * 20;
-                    const nodeOpacity = interpolate(frame, [nodeDelay, nodeDelay + 30], [0, 1], {
-                        extrapolateRight: 'clamp',
-                    });
-
-                    // Pulse animation for connection
-                    const pulseProgress = ((frame - nodeDelay * 2) % 60) / 60;
-                    const pulseOpacity = pulseProgress > 0 && pulseProgress < 1 ? 0.6 - pulseProgress * 0.6 : 0;
-
-                    return (
-                        <div key={provider.name}>
-                            {/* Connection line */}
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    left: '50%',
-                                    top: '50%',
-                                    width: radius - 60,
-                                    height: 3,
-                                    backgroundColor: `${provider.color}40`,
-                                    transform: `rotate(${angle}rad)`,
-                                    transformOrigin: '0 50%',
-                                    opacity: nodeOpacity,
-                                }}
-                            />
-
-                            {/* Pulse effect */}
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    left: `calc(50% + ${x * pulseProgress}px)`,
-                                    top: `calc(50% + ${y * pulseProgress}px)`,
-                                    width: 16,
-                                    height: 16,
-                                    borderRadius: '50%',
-                                    backgroundColor: provider.color,
-                                    transform: 'translate(-50%, -50%)',
-                                    opacity: pulseOpacity,
-                                    boxShadow: `0 0 20px ${provider.color}`,
-                                }}
-                            />
-
-                            {/* Provider node */}
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    left: `calc(50% + ${x}px)`,
-                                    top: `calc(50% + ${y}px)`,
-                                    transform: 'translate(-50%, -50%)',
-                                    opacity: nodeOpacity,
-                                }}
-                            >
+                    {/* Header row */}
+                    <div style={{ display: 'flex', gap: 20 }}>
+                        {LLM_NODES.map((node, i) => {
+                            const cardDelay = i * 15;
+                            const cardOpacity = interpolate(
+                                frame,
+                                [280 + cardDelay, 310 + cardDelay],
+                                [0, 1],
+                                { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+                            );
+                            return (
                                 <div
+                                    key={node.id}
                                     style={{
-                                        width: 100,
-                                        height: 100,
-                                        borderRadius: '50%',
-                                        backgroundColor: theme.colors.background.secondary,
-                                        border: `3px solid ${provider.color}`,
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        boxShadow: `0 0 30px ${provider.color}40`,
+                                        opacity: cardOpacity,
+                                        flex: 1,
+                                        backgroundColor: theme.colors.background.tertiary,
+                                        borderRadius: 12,
+                                        padding: 20,
+                                        border: `2px solid ${node.color}`,
+                                        textAlign: 'center',
                                     }}
                                 >
-                                    <span
-                                        style={{
-                                            fontSize: 14,
-                                            fontFamily: theme.fonts.body,
-                                            fontWeight: 600,
-                                            color: provider.color,
-                                        }}
-                                    >
-                                        {provider.name}
-                                    </span>
+                                    <div style={{
+                                        fontSize: 24,
+                                        fontFamily: theme.fonts.heading,
+                                        color: node.color,
+                                        fontWeight: 600,
+                                    }}>
+                                        {node.label}
+                                    </div>
+                                    <div style={{
+                                        fontSize: 14,
+                                        fontFamily: theme.fonts.body,
+                                        color: theme.colors.text.muted,
+                                        marginTop: 8,
+                                    }}>
+                                        Connected ✓
+                                    </div>
                                 </div>
-                            </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Progress visualization */}
+                    <div
+                        style={{
+                            flex: 1,
+                            backgroundColor: theme.colors.background.primary,
+                            borderRadius: 12,
+                            padding: 30,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <div style={{
+                            fontSize: 28,
+                            fontFamily: theme.fonts.body,
+                            color: theme.colors.text.secondary,
+                            marginBottom: 20,
+                        }}>
+                            Collecting responses from all providers...
                         </div>
-                    );
-                })}
+                        <div
+                            style={{
+                                width: '80%',
+                                height: 16,
+                                backgroundColor: theme.colors.background.tertiary,
+                                borderRadius: 8,
+                                overflow: 'hidden',
+                            }}
+                        >
+                            <div
+                                style={{
+                                    width: `${interpolate(frame, [300, 420], [0, 100], { extrapolateRight: 'clamp' })}%`,
+                                    height: '100%',
+                                    backgroundColor: theme.colors.primary.DEFAULT,
+                                    boxShadow: `0 0 20px ${theme.colors.primary.DEFAULT}`,
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* Subtitle */}
             <div
                 style={{
                     position: 'absolute',
-                    bottom: 100,
-                    fontSize: 28,
-                    fontFamily: theme.fonts.body,
-                    color: theme.colors.text.secondary,
+                    bottom: 80,
+                    width: '100%',
+                    textAlign: 'center',
                 }}
             >
-                Orchestrated collection via OpenRouter API
+                <AnimatedText
+                    text="Orchestrated via OpenRouter API"
+                    fontSize={24}
+                    color={theme.colors.text.secondary}
+                    delay={60}
+                    effect="fade"
+                />
             </div>
         </AbsoluteFill>
     );
