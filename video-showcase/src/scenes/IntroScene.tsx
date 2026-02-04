@@ -1,62 +1,92 @@
 import React from 'react';
-import { AbsoluteFill, useCurrentFrame, interpolate } from 'remotion';
+import { AbsoluteFill, useCurrentFrame, interpolate, random } from 'remotion';
 import { theme } from '../styles/theme';
+import { BrandLogo } from '../components/BrandLogo';
+import { AnimatedText } from '../components/AnimatedText';
+import { GlowEffect } from '../components/GlowEffect';
+
+// Generate particles with deterministic positions
+const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+    x: random(`particle-x-${i}`) * 100,
+    startY: 100 + random(`particle-y-${i}`) * 20,
+    size: 4 + random(`particle-size-${i}`) * 8,
+    speed: 0.3 + random(`particle-speed-${i}`) * 0.5,
+    delay: random(`particle-delay-${i}`) * 60,
+}));
 
 export const IntroScene: React.FC = () => {
     const frame = useCurrentFrame();
 
-    // Logo fade in (0-60 frames)
-    const logoOpacity = interpolate(frame, [0, 60], [0, 1], {
+    // Logo animation timing
+    const logoProgress = interpolate(frame, [0, 60], [0, 1], {
         extrapolateRight: 'clamp',
     });
 
-    // Logo scale (0-60 frames)
-    const logoScale = interpolate(frame, [0, 60], [0.8, 1], {
-        extrapolateRight: 'clamp',
-    });
-
-    // Tagline fade in (90-150 frames)
-    const taglineOpacity = interpolate(frame, [90, 130], [0, 1], {
-        extrapolateLeft: 'clamp',
-        extrapolateRight: 'clamp',
-    });
+    // Tagline starts at frame 90
+    const showTagline = frame >= 90;
 
     return (
         <AbsoluteFill
             style={{
-                backgroundColor: theme.colors.background.primary,
+                background: `radial-gradient(ellipse at center, ${theme.colors.background.secondary} 0%, ${theme.colors.background.primary} 70%)`,
                 justifyContent: 'center',
                 alignItems: 'center',
                 flexDirection: 'column',
+                overflow: 'hidden',
             }}
         >
-            {/* Logo */}
-            <div
-                style={{
-                    opacity: logoOpacity,
-                    transform: `scale(${logoScale})`,
-                    fontSize: 120,
-                    fontFamily: theme.fonts.heading,
-                    fontWeight: 700,
-                    color: theme.colors.primary.DEFAULT,
-                    textShadow: `0 0 40px ${theme.colors.primary.DEFAULT}`,
-                    marginBottom: 32,
-                }}
-            >
-                🍀 Clover
+            {/* Floating particles */}
+            {PARTICLES.map((particle, i) => {
+                const particleFrame = frame - particle.delay;
+                const y = interpolate(
+                    particleFrame,
+                    [0, 150],
+                    [particle.startY, particle.startY - 60],
+                    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+                );
+                const opacity = interpolate(
+                    particleFrame,
+                    [0, 30, 120, 150],
+                    [0, 0.6, 0.6, 0],
+                    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+                );
+
+                return (
+                    <div
+                        key={i}
+                        style={{
+                            position: 'absolute',
+                            left: `${particle.x}%`,
+                            top: `${y}%`,
+                            width: particle.size,
+                            height: particle.size,
+                            borderRadius: '50%',
+                            backgroundColor: theme.colors.primary.light,
+                            opacity,
+                            boxShadow: `0 0 ${particle.size * 2}px ${theme.colors.primary.DEFAULT}`,
+                        }}
+                    />
+                );
+            })}
+
+            {/* Logo with glow */}
+            <div style={{ opacity: logoProgress }}>
+                <GlowEffect intensity={50} spread={30}>
+                    <BrandLogo size={100} showText={true} />
+                </GlowEffect>
             </div>
 
             {/* Tagline */}
-            <div
-                style={{
-                    opacity: taglineOpacity,
-                    fontSize: 36,
-                    fontFamily: theme.fonts.body,
-                    color: theme.colors.text.secondary,
-                }}
-            >
-                AI Visibility & Distribution
-            </div>
+            {showTagline && (
+                <AnimatedText
+                    text="AI Visibility & Distribution"
+                    fontSize={36}
+                    color={theme.colors.text.secondary}
+                    effect="fade"
+                    delay={0}
+                    style={{ marginTop: 32 }}
+                />
+            )}
         </AbsoluteFill>
     );
 };
