@@ -86,7 +86,7 @@ export const DataCollectionScene: React.FC = () => {
                 />
             </div>
 
-            {/* Part 3: Dashboard Visualization (stylized since no screenshot) */}
+            {/* Part 3: Dashboard Visualization (Literal Screenshot) */}
             <div
                 style={{
                     opacity: dashboardOpacity,
@@ -96,104 +96,23 @@ export const DataCollectionScene: React.FC = () => {
                     transform: `translateX(-50%) scale(${kenBurnsScale}) translateY(${kenBurnsPan}px)`,
                 }}
             >
-                {/* Stylized dashboard representation */}
                 <div
                     style={{
                         width: 1400,
                         height: 700,
-                        backgroundColor: theme.colors.background.secondary,
+                        overflow: 'hidden',
                         borderRadius: 20,
                         border: `2px solid ${theme.colors.background.tertiary}`,
-                        padding: 40,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 24,
+                        boxShadow: `0 0 50px rgba(0,0,0,0.5)`,
                     }}
                 >
-                    {/* Header row */}
-                    <div style={{ display: 'flex', gap: 20 }}>
-                        {LLM_NODES.map((node, i) => {
-                            const cardDelay = i * 15;
-                            const cardOpacity = interpolate(
-                                frame,
-                                [280 + cardDelay, 310 + cardDelay],
-                                [0, 1],
-                                { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
-                            );
-                            return (
-                                <div
-                                    key={node.id}
-                                    style={{
-                                        opacity: cardOpacity,
-                                        flex: 1,
-                                        backgroundColor: theme.colors.background.tertiary,
-                                        borderRadius: 12,
-                                        padding: 20,
-                                        border: `2px solid ${node.color}`,
-                                        textAlign: 'center',
-                                    }}
-                                >
-                                    <div style={{
-                                        fontSize: 24,
-                                        fontFamily: theme.fonts.heading,
-                                        color: node.color,
-                                        fontWeight: 600,
-                                    }}>
-                                        {node.label}
-                                    </div>
-                                    <div style={{
-                                        fontSize: 14,
-                                        fontFamily: theme.fonts.body,
-                                        color: theme.colors.text.muted,
-                                        marginTop: 8,
-                                    }}>
-                                        Connected ✓
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                    {/* Progress visualization */}
-                    <div
+                    <Img
+                        src={staticFile('screenshots/settings.png')}
                         style={{
-                            flex: 1,
-                            backgroundColor: theme.colors.background.primary,
-                            borderRadius: 12,
-                            padding: 30,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center',
+                            width: '100%',
+                            height: 'auto',
                         }}
-                    >
-                        <div style={{
-                            fontSize: 28,
-                            fontFamily: theme.fonts.body,
-                            color: theme.colors.text.secondary,
-                            marginBottom: 20,
-                        }}>
-                            Collecting responses from all providers...
-                        </div>
-                        <div
-                            style={{
-                                width: '80%',
-                                height: 16,
-                                backgroundColor: theme.colors.background.tertiary,
-                                borderRadius: 8,
-                                overflow: 'hidden',
-                            }}
-                        >
-                            <div
-                                style={{
-                                    width: `${interpolate(frame, [300, 420], [0, 100], { extrapolateRight: 'clamp' })}%`,
-                                    height: '100%',
-                                    backgroundColor: theme.colors.primary.DEFAULT,
-                                    boxShadow: `0 0 20px ${theme.colors.primary.DEFAULT}`,
-                                }}
-                            />
-                        </div>
-                    </div>
+                    />
                 </div>
             </div>
 

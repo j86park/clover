@@ -1,5 +1,5 @@
 import React from 'react';
-import { AbsoluteFill, useCurrentFrame, interpolate } from 'remotion';
+import { AbsoluteFill, useCurrentFrame, interpolate, Img, staticFile } from 'remotion';
 import { theme } from '../styles/theme';
 import { AnimatedText } from '../components/AnimatedText';
 import { MetricCard } from '../components/MetricCard';
@@ -107,102 +107,68 @@ export const AnalysisScene: React.FC = () => {
                 </div>
             </div>
 
-            {/* Extracted entities cards */}
+            {/* Part 3: Results Visualization (Literal Screenshots) */}
             <div
                 style={{
-                    display: 'flex',
-                    gap: 30,
-                    justifyContent: 'center',
-                    marginBottom: 40,
                     opacity: resultsOpacity,
+                    position: 'absolute',
+                    top: 140,
+                    left: '50%',
+                    transform: `translateX(-50%)`,
+                    width: 1400,
                 }}
             >
-                {EXTRACTED_ENTITIES.map((entity, index) => {
-                    const cardDelay = index * 10;
-                    const cardScale = interpolate(
-                        frame,
-                        [260 + cardDelay, 290 + cardDelay],
-                        [0.8, 1],
-                        { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
-                    );
+                {/* Phase A: Claude Analysis (250-350) */}
+                <div style={{
+                    opacity: interpolate(frame, [250, 280, 340, 360], [0, 1, 1, 0]),
+                    position: 'absolute',
+                    width: '100%',
+                    borderRadius: 20,
+                    overflow: 'hidden',
+                    border: `2px solid ${theme.colors.background.tertiary}`,
+                }}>
+                    <Img src={staticFile('screenshots/analysis_claude.png')} style={{ width: '100%' }} />
+                </div>
 
-                    return (
-                        <div
-                            key={entity.name}
-                            style={{
-                                transform: `scale(${cardScale})`,
-                                backgroundColor: theme.colors.background.secondary,
-                                padding: '24px 48px',
-                                borderRadius: 16,
-                                border: `2px solid ${entity.color}`,
-                                boxShadow: `0 0 30px ${entity.color}30`,
-                                textAlign: 'center',
-                            }}
-                        >
-                            <div
-                                style={{
-                                    fontSize: 28,
-                                    fontFamily: theme.fonts.heading,
-                                    fontWeight: 600,
-                                    color: theme.colors.text.primary,
-                                    marginBottom: 8,
-                                }}
-                            >
-                                {entity.name}
-                            </div>
-                            <div
-                                style={{
-                                    fontSize: 14,
-                                    fontFamily: theme.fonts.body,
-                                    color: theme.colors.text.muted,
-                                    marginBottom: 4,
-                                }}
-                            >
-                                {entity.type}
-                            </div>
-                            <div
-                                style={{
-                                    fontSize: 16,
-                                    fontFamily: theme.fonts.body,
-                                    color: entity.sentiment === 'positive' ? theme.colors.primary.DEFAULT : theme.colors.text.muted,
-                                    textTransform: 'capitalize',
-                                }}
-                            >
-                                {entity.sentiment}
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
+                {/* Phase B: GPT Analysis (360-450) */}
+                <div style={{
+                    opacity: interpolate(frame, [350, 380], [0, 1]),
+                    position: 'absolute',
+                    width: '100%',
+                    borderRadius: 20,
+                    overflow: 'hidden',
+                    border: `2px solid ${theme.colors.background.tertiary}`,
+                }}>
+                    <Img src={staticFile('screenshots/analysis_gpt.png')} style={{ width: '100%' }} />
+                </div>
 
-            {/* Metrics row */}
-            <div
-                style={{
-                    display: 'flex',
-                    gap: 30,
-                    justifyContent: 'center',
-                    opacity: resultsOpacity,
-                }}
-            >
-                <MetricCard
-                    name="Entities Found"
-                    value={3}
-                    delay={280}
-                    style={{ minWidth: 200 }}
-                />
-                <MetricCard
-                    name="Avg. Sentiment"
-                    value={0.72}
-                    change="+0.08"
-                    delay={290}
-                    style={{ minWidth: 200 }}
-                />
-                <MetricCard
-                    name="Topics Covered"
-                    value={5}
-                    delay={300}
-                    style={{ minWidth: 200 }}
-                />
+                {/* Floating Metrics on top */}
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: 500,
+                        left: 0,
+                        right: 0,
+                        display: 'flex',
+                        gap: 30,
+                        justifyContent: 'center',
+                        zIndex: 20,
+                    }}
+                >
+                    <MetricCard
+                        name="Mentions Found"
+                        value={13}
+                        delay={280}
+                        style={{ minWidth: 200, boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}
+                    />
+                    <MetricCard
+                        name="Sentiment"
+                        value={0.72}
+                        unit="/ 1.0"
+                        delay={300}
+                        style={{ minWidth: 200, boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}
+                    />
+                </div>
             </div>
 
             {/* Subtitle */}
