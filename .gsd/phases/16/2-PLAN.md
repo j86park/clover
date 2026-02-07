@@ -25,7 +25,7 @@ Implement a notification system that alerts users via email when their brand's L
 
 1. **Resend Account**: 
    - Sign up at [resend.com](https://resend.com).
-   - Create an API Key.
+   - Create an API Key with **"Sending"** permissions (safer than Full Access).
    - Add `RESEND_API_KEY=re_your_key` to `dashboard/.env.local`.
 
 2. **Supabase Migration**:

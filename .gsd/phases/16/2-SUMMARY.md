@@ -43,4 +43,4 @@ TypeScript compilation successful
 
 ## Manual Setup Required
 1. Run `016_alerts.sql` in Supabase SQL Editor
-2. Add `RESEND_API_KEY` to `.env.local`
+2. Add `RESEND_API_KEY` to `.env.local` (Use **"Sending"** permissions)
