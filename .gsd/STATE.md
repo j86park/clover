@@ -14,10 +14,11 @@
   - 18.1: Recommendations Engine ✅
   - 18.2: Content Gap Analysis ✅
   - 18.3: Citation Network Visualization ✅
-    - citation-network.ts with buildCitationNetwork()
-    - CitationGraph SVG component at /citations
-    - Sidebar nav item added
+  - 18.4: Scheduled Collections ✅
+    - SQL migration for schedules
+    - Inngest cron checker (15m interval)
+    - Schedule settings UI at /settings/schedules
 
 ## Next Steps
-1. Run `/execute 18.4` to start Scheduled Collections
+1. Run `/execute 18.5` to start Natural Language Query Interface
 2. Or continue with `/execute 18` to execute remaining Phase 18 plans

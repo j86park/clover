@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
-import { Key, BarChart3, Building2, FileText, Bell } from 'lucide-react';
+import { Key, BarChart3, Building2, FileText, Bell, Clock } from 'lucide-react';
 
 export default function SettingsPage() {
     return (
@@ -50,6 +50,20 @@ export default function SettingsPage() {
                         <CardContent>
                             <p className="text-sm text-muted-foreground">
                                 Get notified when visibility metrics change significantly
+                            </p>
+                        </CardContent>
+                    </Card>
+                </Link>
+
+                <Link href="/settings/schedules">
+                    <Card className="hover:bg-muted/50 transition-colors cursor-pointer border-emerald-500/20 bg-emerald-500/5">
+                        <CardHeader className="flex flex-row items-center space-y-0">
+                            <Clock className="h-5 w-5 mr-3 text-emerald-500" />
+                            <CardTitle className="text-lg">Automated Collections</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">
+                                Configure daily or weekly automated data collection runs
                             </p>
                         </CardContent>
                     </Card>

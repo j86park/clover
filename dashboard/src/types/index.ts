@@ -136,5 +136,20 @@ export interface QuickCheckResult {
 // Re-export prompt effectiveness types
 export type { PromptEffectiveness, PromptEffectivenessSummary } from '@/lib/analysis/prompt-effectiveness';
 
+// Collection Schedule Type
+export interface CollectionSchedule {
+    id: string;
+    user_id: string;
+    brand_id: string;
+    schedule_type: 'daily' | 'weekly' | 'custom';
+    cron_expression: string | null;
+    time_utc: string; // HH:MM format
+    day_of_week: number | null; // 0-6, 0 = Sunday
+    is_active: boolean;
+    last_run_at: string | null;
+    next_run_at: string | null;
+    created_at: string;
+    updated_at: string;
+}
 
 export * from './testing';
