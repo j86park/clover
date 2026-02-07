@@ -2,6 +2,7 @@ import { createServerClient } from '@/lib/supabase';
 import { AnalysisList } from '@/components/dashboard/analysis-list';
 import { PromptEffectivenessCard } from '@/components/analysis/prompt-effectiveness-card';
 import { ModelBreakdownSection } from '@/components/analysis/model-breakdown-section';
+import { ContentGapTable } from '@/components/analysis/content-gap-table';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,6 +61,9 @@ export default async function AnalysisPage({ searchParams }: PageProps) {
 
             {/* Model Comparison Section */}
             <ModelBreakdownSection collectionId={collection_id} />
+
+            {/* Content Gap Analysis Section */}
+            <ContentGapTable />
 
             <AnalysisList analyses={(analyses || []) as any} />
         </div>
