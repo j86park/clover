@@ -3,18 +3,7 @@
  * Uses follow-up LLM call to explain why a brand was recommended
  */
 
-import OpenAI from 'openai';
-
-// Lazy-load OpenAI client
-let openaiClient: OpenAI | null = null;
-function getOpenAI(): OpenAI {
-    if (!openaiClient) {
-        openaiClient = new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY,
-        });
-    }
-    return openaiClient;
-}
+import { queryLLM } from '@/lib/openrouter/client';
 
 export interface ExplainRequest {
     originalPrompt: string;
@@ -30,6 +19,8 @@ export interface MentionExplanation {
     confidence: 'high' | 'medium' | 'low';
     suggestions: string[];
 }
+
+const EXPLAINER_MODEL = 'openai/gpt-4o-mini';
 
 const EXPLAINER_SYSTEM_PROMPT = `You are a brand visibility analyst. Analyze why a specific brand was mentioned or recommended in an AI response.
 
@@ -66,19 +57,15 @@ ${mentionContext ? `Context of mention: "${mentionContext}"` : ''}
 Explain why ${mentionedBrand} was mentioned or recommended in this response. What factors likely influenced this? How could ${mentionedBrand} improve its visibility in similar queries?`;
 
     try {
-        const openai = getOpenAI();
-        const completion = await openai.chat.completions.create({
-            model: 'gpt-4o-mini',
-            messages: [
-                { role: 'system', content: EXPLAINER_SYSTEM_PROMPT },
-                { role: 'user', content: userPrompt },
-            ],
+        const response = await queryLLM(EXPLAINER_MODEL, [
+            { role: 'system', content: EXPLAINER_SYSTEM_PROMPT },
+            { role: 'user', content: userPrompt },
+        ], {
             temperature: 0.3,
-            max_tokens: 500,
+            maxTokens: 500
         });
 
-        const content = completion.choices[0]?.message?.content || '';
-        const parsed = parseExplanationResponse(content);
+        const parsed = parseExplanationResponse(response.content);
 
         return {
             brandName: mentionedBrand,
