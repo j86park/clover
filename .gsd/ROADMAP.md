@@ -205,3 +205,15 @@
 - Hybrid feature showcase scenes (stylized + dashboard screenshots)
 - Data collection, analysis, dashboard, and testing scenes
 - Rendered 60-90 second showcase video
+
+---
+
+### Phase 16: MVP Feature Enhancements
+**Status**: 🆕 Planned
+**Objective**: Add high-impact, low-effort features to enhance MVP value proposition
+
+**Deliverables:**
+- Prompt Library Templates with pre-built, research-backed templates
+- Email/Slack Alerts for significant metric changes
+- Export to PDF/CSV for shareable reports
+- Competitor Watchlist for quick competitor monitoring
