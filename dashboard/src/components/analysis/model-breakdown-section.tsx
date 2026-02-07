@@ -1,5 +1,7 @@
 'use client';
 
+// This component provides a combined view of LLM model performance metrics.
+
 /**
  * Model Breakdown Section
  * Client component that fetches model breakdown data and renders both radar and heatmap

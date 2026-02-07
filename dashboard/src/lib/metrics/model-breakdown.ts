@@ -55,33 +55,34 @@ export async function getMetricsByModel(
 ): Promise<ModelBreakdownSummary> {
     const supabase = await createServerClient();
 
-    // Build query for responses with their analysis results
+    // Build query for analysis results joined with their responses
     let query = supabase
-        .from('llm_responses')
+        .from('analysis')
         .select(`
             id,
-            model,
-            collection_id,
-            collections!inner(brand_id),
-            analysis_results!inner(
-                mentions,
-                overall_sentiment
+            mentions,
+            responses!inner (
+                model,
+                collection_id,
+                collections!inner (
+                    brand_id
+                )
             )
         `)
-        .eq('collections.brand_id', brandId);
+        .eq('responses.collections.brand_id', brandId);
 
     if (collectionId) {
-        query = query.eq('collection_id', collectionId);
+        query = query.eq('responses.collection_id', collectionId);
     }
 
-    const { data: responses, error } = await query;
+    const { data: analyses, error } = await query;
 
     if (error) {
-        console.error('Error fetching responses for model breakdown:', error);
+        console.error('Error fetching analysis data for model breakdown:', error);
         return { models: [], bestModel: null, worstModel: null, totalModels: 0 };
     }
 
-    if (!responses || responses.length === 0) {
+    if (!analyses || analyses.length === 0) {
         return { models: [], bestModel: null, worstModel: null, totalModels: 0 };
     }
 
@@ -98,12 +99,11 @@ export async function getMetricsByModel(
     // Calculate total mentions across all models for ASoV calculation
     let totalMentionsAcrossModels = 0;
 
-    for (const response of responses) {
-        const model = response.model;
-        const analysisResults = response.analysis_results as unknown as Array<{
-            mentions?: Array<{ brand_name?: string; sentiment?: string }>;
-            overall_sentiment?: string;
-        }>;
+    for (const analysis of analyses) {
+        // Safe casting to handle Supabase join result type
+        const responseData = analysis.responses as any;
+        const model = responseData?.model || 'unknown';
+        const mentions = (analysis.mentions || []) as any[];
 
         if (!modelAggregations.has(model)) {
             modelAggregations.set(model, {
@@ -119,22 +119,17 @@ export async function getMetricsByModel(
         const agg = modelAggregations.get(model)!;
         agg.responseCount++;
 
-        // Process analysis results for this response
-        for (const result of analysisResults) {
-            const mentions = result.mentions || [];
+        if (mentions.length > 0) {
+            agg.responsesWithBrand++;
+            agg.mentionCount += mentions.length;
+            totalMentionsAcrossModels += mentions.length;
 
-            if (mentions.length > 0) {
-                agg.responsesWithBrand++;
-                agg.mentionCount += mentions.length;
-                totalMentionsAcrossModels += mentions.length;
-
-                // Count sentiment from mentions
-                for (const mention of mentions) {
-                    switch (mention.sentiment) {
-                        case 'positive': agg.positive++; break;
-                        case 'neutral': agg.neutral++; break;
-                        case 'negative': agg.negative++; break;
-                    }
+            // Count sentiment from mentions
+            for (const mention of mentions) {
+                switch (mention.sentiment) {
+                    case 'positive': agg.positive++; break;
+                    case 'neutral': agg.neutral++; break;
+                    case 'negative': agg.negative++; break;
                 }
             }
         }

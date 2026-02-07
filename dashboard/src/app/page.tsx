@@ -1,6 +1,7 @@
 import { MetricCard } from '@/components/dashboard/metric-card';
 import { DashboardClient } from '@/components/dashboard/dashboard-client';
 import { ExportButtons } from '@/components/dashboard/export-buttons';
+import { RecommendationsPanel } from '@/components/dashboard/recommendations-panel';
 import { BarChart3, TrendingUp, Heart, Award } from 'lucide-react';
 import { createServerClient } from '@/lib/supabase';
 import { getCollectionMetrics } from '@/lib/metrics/pipeline';
@@ -176,6 +177,9 @@ export default async function Home() {
         chartData={chartData}
         authorityData={authorityData}
       />
+
+      {/* Recommendations Section */}
+      <RecommendationsPanel />
 
       {!hasData && (
         <div className="rounded-lg border bg-card p-6 border-dashed">
