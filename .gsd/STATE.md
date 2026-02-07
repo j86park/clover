@@ -4,7 +4,7 @@
 
 ## Current Position
 - **Phase**: 18 (in progress)
-- **Plan**: 18.3 complete
+- **Plan**: 18.5 complete
 - **Status**: Executing
 
 ## What Was Accomplished
@@ -15,10 +15,9 @@
   - 18.2: Content Gap Analysis ✅
   - 18.3: Citation Network Visualization ✅
   - 18.4: Scheduled Collections ✅
-    - SQL migration for schedules
-    - Inngest cron checker (15m interval)
-    - Schedule settings UI at /settings/schedules
+  - 18.5: Prompt Library Integration ✅ (Custom Task)
+    - Browse and add custom/global prompts to collection runs
+    - New PromptSelectorDialog component
 
 ## Next Steps
-1. Run `/execute 18.5` to start Natural Language Query Interface
-2. Or continue with `/execute 18` to execute remaining Phase 18 plans
+1. Run `/execute 18.5` to start Natural Language Query Interface (now 18.6 shifted)

@@ -39,14 +39,14 @@ function calculateNextRun(schedule: CollectionSchedule): Date {
 
 /**
  * Scheduled Collection Checker
- * Runs every 15 minutes to check for due scheduled collections
+ * Runs daily to check for due scheduled collections
  */
 export const scheduledCollectionChecker = inngest.createFunction(
     {
         id: "scheduled-collection-checker",
         name: "Scheduled Collection Checker",
     },
-    { cron: "*/15 * * * *" }, // Every 15 minutes
+    { cron: "0 0 * * *" }, // Every day at midnight UTC
     async ({ step }) => {
         const supabase = createServiceClient();
 

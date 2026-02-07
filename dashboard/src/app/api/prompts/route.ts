@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
         const { category, intent, template } = createPromptSchema.parse(body);
 
         const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
 
         const { data: prompt, error } = await supabase
             .from('prompts')
@@ -79,6 +80,7 @@ export async function POST(request: NextRequest) {
                 category,
                 intent,
                 template,
+                user_id: user?.id,
                 is_active: true,
             })
             .select()
