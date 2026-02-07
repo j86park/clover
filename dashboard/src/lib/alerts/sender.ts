@@ -6,11 +6,21 @@
 import { Resend } from 'resend';
 import type { AlertTriggerResult } from '@/types/alerts';
 
-// Initialize Resend client
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 // Default from address (must be verified in Resend dashboard)
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'alerts@updates.clover.dev';
+
+// Lazy initialize Resend client
+let resendClient: Resend | null = null;
+
+function getResendClient(): Resend | null {
+    if (!process.env.RESEND_API_KEY) {
+        return null;
+    }
+    if (!resendClient) {
+        resendClient = new Resend(process.env.RESEND_API_KEY);
+    }
+    return resendClient;
+}
 
 export interface SendAlertOptions {
     to: string;
@@ -25,7 +35,8 @@ export interface SendAlertOptions {
 export async function sendEmailAlert(options: SendAlertOptions): Promise<{ success: boolean; error?: string }> {
     const { to, brandName, triggers, dashboardUrl = 'https://clover.dev' } = options;
 
-    if (!process.env.RESEND_API_KEY) {
+    const resend = getResendClient();
+    if (!resend) {
         console.warn('[Alerts] RESEND_API_KEY not configured, skipping email');
         return { success: false, error: 'RESEND_API_KEY not configured' };
     }
