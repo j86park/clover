@@ -214,6 +214,6 @@
 
 **Deliverables:**
 - Prompt Library Templates with pre-built, research-backed templates
-- Email/Slack Alerts for significant metric changes
+- Email Alerts for significant metric changes
 - Export to PDF/CSV for shareable reports
 - Competitor Watchlist for quick competitor monitoring
