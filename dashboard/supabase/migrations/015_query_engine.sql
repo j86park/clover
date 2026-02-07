@@ -13,7 +13,7 @@ DECLARE
     result JSONB;
 BEGIN
     -- Check for forbidden keywords to prevent mutations
-    IF query_text ~* '(UPDATE|DELETE|INSERT|DROP|ALTER|TRUNCATE|CREATE|GRANT|REVOKE)' THEN
+    IF query_text ~* '\y(UPDATE|DELETE|INSERT|DROP|ALTER|TRUNCATE|CREATE|GRANT|REVOKE)\y' THEN
         RAISE EXCEPTION 'Query contains forbidden keywords (INSERT, UPDATE, DELETE, etc.)';
     END IF;
 
