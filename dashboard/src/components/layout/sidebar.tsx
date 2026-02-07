@@ -8,6 +8,7 @@ import {
     LayoutDashboard,
     Database,
     BarChart3,
+    Users,
     Settings,
 } from 'lucide-react';
 
@@ -26,6 +27,11 @@ const navItems = [
         title: 'Analysis',
         href: '/analysis',
         icon: BarChart3,
+    },
+    {
+        title: 'Competitors',
+        href: '/competitors',
+        icon: Users,
     },
     {
         title: 'Settings',
