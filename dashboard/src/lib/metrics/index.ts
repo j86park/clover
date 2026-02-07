@@ -5,3 +5,4 @@
 export * from './calculators';
 export * from './aggregator';
 export * from './pipeline';
+export * from './model-breakdown';

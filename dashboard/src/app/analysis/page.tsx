@@ -1,6 +1,7 @@
 import { createServerClient } from '@/lib/supabase';
 import { AnalysisList } from '@/components/dashboard/analysis-list';
 import { PromptEffectivenessCard } from '@/components/analysis/prompt-effectiveness-card';
+import { ModelBreakdownSection } from '@/components/analysis/model-breakdown-section';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,8 +58,10 @@ export default async function AnalysisPage({ searchParams }: PageProps) {
             {/* Prompt Effectiveness Section */}
             <PromptEffectivenessCard />
 
+            {/* Model Comparison Section */}
+            <ModelBreakdownSection collectionId={collection_id} />
+
             <AnalysisList analyses={(analyses || []) as any} />
         </div>
     );
 }
-

@@ -10,6 +10,8 @@ interface WizardStepProps {
     description?: string;
     isActive: boolean;
     isComplete: boolean;
+    isClickable?: boolean;
+    onClick?: () => void;
     children: React.ReactNode;
 }
 
@@ -19,19 +21,27 @@ export function WizardStep({
     description,
     isActive,
     isComplete,
+    isClickable = false,
+    onClick,
     children,
 }: WizardStepProps) {
     return (
         <div className={cn(
             'border rounded-lg transition-all duration-200',
             isActive ? 'border-emerald-500 bg-emerald-500/5' : 'border-border',
-            isComplete && !isActive ? 'border-emerald-500/50 bg-muted/30' : ''
+            isComplete && !isActive ? 'border-emerald-500/50 bg-muted/30' : '',
+            isClickable && !isActive ? 'hover:border-emerald-500/50' : ''
         )}>
             {/* Step Header */}
-            <div className={cn(
-                'flex items-center gap-4 p-4 cursor-pointer',
-                !isActive && 'opacity-75'
-            )}>
+            <div
+                onClick={() => isClickable && onClick?.()}
+                className={cn(
+                    'flex items-center gap-4 p-4',
+                    isClickable ? 'cursor-pointer' : 'cursor-default',
+                    !isActive && !isClickable && 'opacity-50',
+                    !isActive && isClickable && 'opacity-75'
+                )}
+            >
                 {/* Step Number / Check */}
                 <div className={cn(
                     'flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold transition-colors',

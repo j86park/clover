@@ -221,14 +221,14 @@
 ---
 
 ### Phase 17: Tier 2 — Medium-Impact Differentiators
-**Status**: 🔄 In Progress
+**Status**: ✅ Complete
 **Objective**: Add medium-effort features that differentiate the product and provide deeper insights
 
 **Deliverables:**
 - **17.1: Prompt Effectiveness Scoring** — Analyze which prompts generate the most favorable brand mentions ✓
-- **17.2: "Why Did They Say That?" Explainer** — Follow-up LLM call explaining reasoning behind each recommendation
-- **17.3: Prompt Builder Wizard** — Guided UI to construct effective prompts with category → intent → brand/competitor toggles
-- **17.4: Model-by-Model Breakdown** — Radar charts and heatmaps showing how GPT-4, Claude, Gemini perceive brands differently
+- **17.2: "Why Did They Say That?" Explainer** — Follow-up LLM call explaining reasoning behind each recommendation ✓
+- **17.3: Prompt Builder Wizard** — Guided UI to construct effective prompts with category → intent → brand/competitor toggles ✓
+- **17.4: Model-by-Model Breakdown** — Radar charts and heatmaps showing how GPT-4, Claude, Gemini perceive brands differently ✓
 
 ---
 

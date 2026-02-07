@@ -94,6 +94,22 @@ export default function PromptBuilderPage() {
         }
     };
 
+    const isStepClickable = (step: number): boolean => {
+        if (step <= currentStep) return true;
+
+        // A step is clickable if all required steps before it are complete
+        for (let i = 1; i < step; i++) {
+            if (!canProceed(i)) return false;
+        }
+        return true;
+    };
+
+    const handleStepClick = (step: number) => {
+        if (isStepClickable(step)) {
+            setCurrentStep(step);
+        }
+    };
+
     const handleSavePrompt = async (prompts: string[]) => {
         setSaving(true);
         setError(null);
@@ -176,6 +192,8 @@ export default function PromptBuilderPage() {
                         description="What type of prompt are you creating?"
                         isActive={currentStep === 1}
                         isComplete={currentStep > 1}
+                        isClickable={isStepClickable(1)}
+                        onClick={() => handleStepClick(1)}
                     >
                         <div className="grid sm:grid-cols-2 gap-3">
                             {PROMPT_CATEGORIES.map((cat) => (
@@ -201,6 +219,8 @@ export default function PromptBuilderPage() {
                         description="What do you want the prompt to accomplish?"
                         isActive={currentStep === 2}
                         isComplete={currentStep > 2}
+                        isClickable={isStepClickable(2)}
+                        onClick={() => handleStepClick(2)}
                     >
                         {state.category && (
                             <div className="grid sm:grid-cols-2 gap-3">
@@ -227,6 +247,8 @@ export default function PromptBuilderPage() {
                         description="Add brand and competitor names to personalize"
                         isActive={currentStep === 3}
                         isComplete={currentStep > 3}
+                        isClickable={isStepClickable(3)}
+                        onClick={() => handleStepClick(3)}
                     >
                         <div className="space-y-4">
                             <div className="space-y-2">
@@ -281,6 +303,8 @@ export default function PromptBuilderPage() {
                         description="Set the tone and output format"
                         isActive={currentStep === 4}
                         isComplete={currentStep > 4}
+                        isClickable={isStepClickable(4)}
+                        onClick={() => handleStepClick(4)}
                     >
                         <div className="space-y-4">
                             <div className="space-y-2">
@@ -341,6 +365,8 @@ export default function PromptBuilderPage() {
                         description="Review your generated prompt"
                         isActive={currentStep === 5}
                         isComplete={currentStep > 5}
+                        isClickable={isStepClickable(5)}
+                        onClick={() => handleStepClick(5)}
                     >
                         <div className="space-y-4">
                             <PromptPreview
@@ -377,6 +403,8 @@ export default function PromptBuilderPage() {
                         description="Generate variations for testing"
                         isActive={currentStep === 6}
                         isComplete={false}
+                        isClickable={isStepClickable(6)}
+                        onClick={() => handleStepClick(6)}
                     >
                         <ABVariantCreator
                             basePrompt={generatedPrompt}
