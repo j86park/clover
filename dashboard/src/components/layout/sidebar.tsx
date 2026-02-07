@@ -11,6 +11,7 @@ import {
     Users,
     Settings,
     Wand2,
+    Link2,
 } from 'lucide-react';
 
 const navItems = [
@@ -28,6 +29,11 @@ const navItems = [
         title: 'Analysis',
         href: '/analysis',
         icon: BarChart3,
+    },
+    {
+        title: 'Citations',
+        href: '/citations',
+        icon: Link2,
     },
     {
         title: 'Prompt Builder',
