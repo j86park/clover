@@ -132,6 +132,17 @@ export function ModelRadarChart({ models, isLoading }: ModelRadarChartProps) {
                             }}
                             labelStyle={{ color: '#f3f4f6' }}
                             itemStyle={{ color: '#d1d5db' }}
+                            formatter={(value: any, name: any, item: any) => {
+                                if (value === undefined || value === null) return ['-', name];
+
+                                const metric = item.payload?.metric;
+                                if (metric === 'Sentiment') {
+                                    // Convert back from normalized 0-100 to original -1..1
+                                    const original = ((value / 100) * 2) - 1;
+                                    return [original.toFixed(2), name];
+                                }
+                                return [`${value.toFixed(1)}%`, name];
+                            }}
                         />
                     </RechartsRadarChart>
                 </ResponsiveContainer>
