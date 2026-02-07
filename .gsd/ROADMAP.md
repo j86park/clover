@@ -209,11 +209,23 @@
 ---
 
 ### Phase 16: MVP Feature Enhancements
-**Status**: 🆕 Planned
+**Status**: ✅ Complete
 **Objective**: Add high-impact, low-effort features to enhance MVP value proposition
 
 **Deliverables:**
-- Prompt Library Templates with pre-built, research-backed templates
-- Email Alerts for significant metric changes
-- Export to PDF/CSV for shareable reports
-- Competitor Watchlist for quick competitor monitoring
+- Prompt Library Templates with pre-built, research-backed templates ✓
+- Email Alerts for significant metric changes ✓
+- Export to PDF/CSV for shareable reports ✓
+- Competitor Watchlist for quick competitor monitoring ✓
+
+---
+
+### Phase 17: Tier 2 — Medium-Impact Differentiators
+**Status**: 🆕 Planned
+**Objective**: Add medium-effort features that differentiate the product and provide deeper insights
+
+**Deliverables:**
+- **17.1: Prompt Effectiveness Scoring** — Analyze which prompts generate the most favorable brand mentions with "This prompt mentions you 80% of the time" insights
+- **17.2: "Why Did They Say That?" Explainer** — Follow-up LLM call explaining reasoning behind each recommendation
+- **17.3: Prompt Builder Wizard** — Guided UI to construct effective prompts with category → intent → brand/competitor toggles
+- **17.4: Model-by-Model Breakdown** — Radar charts and heatmaps showing how GPT-4, Claude, Gemini perceive brands differently
