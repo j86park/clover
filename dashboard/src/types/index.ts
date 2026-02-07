@@ -112,5 +112,26 @@ export interface TestRun {
     created_at: string;
 }
 
+export interface WatchlistEntry {
+    id: string;
+    user_id: string;
+    competitor_name: string;
+    competitor_domain?: string | null;
+    category?: string | null;
+    last_checked_at?: string | null;
+    latest_asov?: number | null;
+    latest_aigvr?: number | null;
+    latest_sentiment?: number | null;
+    trend_direction?: 'up' | 'down' | 'stable' | null;
+    created_at: string;
+}
+
+export interface QuickCheckResult {
+    asov: number;
+    aigvr: number;
+    sentiment: number;
+    checkedAt: string;
+}
+
 
 export * from './testing';

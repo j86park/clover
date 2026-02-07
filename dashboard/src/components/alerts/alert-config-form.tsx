@@ -122,10 +122,11 @@ export function AlertConfigForm({ brands, existingAlert, onSaved, onCancel }: Al
                             value={brandId}
                             onChange={e => setBrandId(e.target.value)}
                             className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                            style={{ backgroundColor: '#1f2937', color: '#fff' }}
                             required
                         >
                             {brands.map(brand => (
-                                <option key={brand.id} value={brand.id}>
+                                <option key={brand.id} value={brand.id} style={{ backgroundColor: '#1f2937', color: '#fff' }}>
                                     {brand.name}
                                 </option>
                             ))}

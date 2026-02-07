@@ -1,8 +1,10 @@
 import { MetricCard } from '@/components/dashboard/metric-card';
 import { DashboardClient } from '@/components/dashboard/dashboard-client';
+import { ExportButtons } from '@/components/dashboard/export-buttons';
 import { BarChart3, TrendingUp, Heart, Award } from 'lucide-react';
 import { createServerClient } from '@/lib/supabase';
 import { getCollectionMetrics } from '@/lib/metrics/pipeline';
+import type { ExportData } from '@/lib/export';
 
 export default async function Home() {
   const supabase = await createServerClient();
@@ -105,6 +107,21 @@ export default async function Home() {
     };
   }
 
+  // Prepare export data
+  const exportData: ExportData = {
+    metrics: {
+      asov: metrics.asov,
+      aigvr: metrics.aigvr,
+      authority_score: metrics.authority,
+      sentiment_score: hasData ? (metrics.sentiment + 1) / 2 * 100 : metrics.sentiment * 100,
+      owned_citations: authorityData.owned,
+      earned_citations: authorityData.earned,
+      external_citations: authorityData.external,
+    },
+    trends: chartData,
+    competitors: [], // TODO: Add competitor data when available
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -114,12 +131,15 @@ export default async function Home() {
             {hasData ? `AI SEO performance for ${brand?.name}` : "Overview of your brand's LLM SEO performance"}
           </p>
         </div>
-        {hasData && (
-          <div className="flex items-center gap-2 bg-green-500/10 text-green-500 px-3 py-1.5 rounded-full border border-green-500/20">
-            <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-xs font-bold uppercase tracking-wider">Live Metrics Enabled</span>
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          {hasData && (
+            <div className="flex items-center gap-2 bg-green-500/10 text-green-500 px-3 py-1.5 rounded-full border border-green-500/20">
+              <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-xs font-bold uppercase tracking-wider">Live Metrics Enabled</span>
+            </div>
+          )}
+          <ExportButtons brandName={brand?.name || 'Brand'} data={exportData} />
+        </div>
       </div>
 
       {/* Metrics Grid */}
