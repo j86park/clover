@@ -6,8 +6,9 @@
 import { Resend } from 'resend';
 import type { AlertTriggerResult } from '@/types/alerts';
 
-// Default from address (must be verified in Resend dashboard)
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'alerts@updates.clover.dev';
+// Default from address - use Resend's testing domain if no custom domain is set
+// To use your own domain, set RESEND_FROM_EMAIL in .env.local after verifying it at resend.com/domains
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Clover Alerts <onboarding@resend.dev>';
 
 // Lazy initialize Resend client
 let resendClient: Resend | null = null;

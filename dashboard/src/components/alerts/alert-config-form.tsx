@@ -93,19 +93,19 @@ export function AlertConfigForm({ brands, existingAlert, onSaved, onCancel }: Al
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <CardHeader className="border-b border-gray-800">
+        <form onSubmit={handleSubmit} className="bg-gray-900">
+            <CardHeader className="border-b border-gray-700 bg-gray-900">
                 <div className="flex items-center justify-between">
-                    <CardTitle className="text-white">
+                    <CardTitle className="text-white text-xl">
                         {existingAlert ? 'Edit Alert' : 'Create New Alert'}
                     </CardTitle>
-                    <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
+                    <Button type="button" variant="ghost" size="sm" onClick={onCancel} className="text-gray-400 hover:text-white">
                         <X className="h-4 w-4" />
                     </Button>
                 </div>
             </CardHeader>
 
-            <CardContent className="space-y-6 pt-6">
+            <CardContent className="space-y-6 pt-6 bg-gray-900">
                 {error && (
                     <div className="bg-red-900/20 border border-red-800 rounded-lg p-3 text-red-400 text-sm">
                         {error}
@@ -252,7 +252,7 @@ export function AlertConfigForm({ brands, existingAlert, onSaved, onCancel }: Al
                 </div>
             </CardContent>
 
-            <CardFooter className="border-t border-gray-800 pt-4">
+            <CardFooter className="border-t border-gray-700 pt-4 bg-gray-900">
                 <div className="flex justify-end gap-3 w-full">
                     <Button type="button" variant="ghost" onClick={onCancel}>
                         Cancel
