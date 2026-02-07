@@ -1,19 +1,22 @@
 # STATE.md — Current Position
 
-> Last updated: 2026-02-06T19:12:00-05:00
+> Last updated: 2026-02-06T19:28:00-05:00
 
 ## Current Position
 - **Phase**: 16
-- **Plan**: 16.1 complete
-- **Status**: Ready for 16.2 (Email/Slack Alerts)
+- **Plan**: 16.2 complete
+- **Status**: Ready for 16.3 (Export to PDF/CSV)
 
 ## What Was Accomplished
 - **Plan 16.1: Prompt Library Templates** ✅
-  - Expanded from 9 to 29 prompts across 5 categories
-  - Created `/settings/prompts` page with template browser UI
-  - Added prompt count display to collections page
-  - Created `/api/prompts/seed` endpoint for new users
+  - 29 prompts across 5 categories with template browser UI
+  
+- **Plan 16.2: Email Alerts** ✅
+  - Alert types and SQL migration with RLS
+  - Resend email integration with emerald-themed HTML
+  - Inngest integration for automatic trigger evaluation
+  - Full settings UI at `/settings/alerts`
 
 ## Next Steps
-1. Continue with Plan 16.2: Email/Slack Alerts
+1. Continue with Plan 16.3: Export to PDF/CSV
 2. Or run `/execute 16` to continue remaining plans
