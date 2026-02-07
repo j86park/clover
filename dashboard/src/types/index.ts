@@ -133,5 +133,8 @@ export interface QuickCheckResult {
     checkedAt: string;
 }
 
+// Re-export prompt effectiveness types
+export type { PromptEffectiveness, PromptEffectivenessSummary } from '@/lib/analysis/prompt-effectiveness';
+
 
 export * from './testing';
