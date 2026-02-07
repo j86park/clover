@@ -152,4 +152,19 @@ export interface CollectionSchedule {
     updated_at: string;
 }
 
+// Query Engine Types
+export interface QueryIntent {
+    metricType: 'asov' | 'aigvr' | 'sentiment' | 'citations' | 'general';
+    timeRange: 'last_week' | 'last_month' | 'last_quarter' | 'all_time';
+    comparison?: string; // competitor name or 'competitors'
+    filters?: Record<string, any>;
+}
+
+export interface QueryResult {
+    answer: string;
+    data?: any[];
+    sql?: string;
+    intent?: QueryIntent;
+}
+
 export * from './testing';

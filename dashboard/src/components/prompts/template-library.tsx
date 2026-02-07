@@ -62,20 +62,20 @@ export function TemplateLibrary({
     const [databasePrompts, setDatabasePrompts] = useState<DatabasePrompt[]>([]);
     const [loadingDbPrompts, setLoadingDbPrompts] = useState(false);
 
-    // Fetch database prompts when in addToCollection mode
+    // Fetch database prompts on mount
     useEffect(() => {
-        if (isAddToCollectionMode) {
-            setLoadingDbPrompts(true);
-            fetch('/api/prompts')
-                .then(res => res.json())
-                .then(response => {
-                    if (response.data) {
-                        setDatabasePrompts(response.data);
-                    }
-                })
-                .catch(err => console.error('Failed to fetch prompts:', err))
-                .finally(() => setLoadingDbPrompts(false));
+        setLoadingDbPrompts(true);
+        fetch('/api/prompts')
+            .then(res => res.json())
+            .then(response => {
+                if (response.data) {
+                    setDatabasePrompts(response.data);
+                }
+            })
+            .catch(err => console.error('Failed to fetch prompts:', err))
+            .finally(() => setLoadingDbPrompts(false));
 
+        if (isAddToCollectionMode) {
             // Load existing added prompt IDs from localStorage
             const existing = localStorage.getItem(COLLECTION_PROMPTS_KEY);
             if (existing) {
@@ -99,10 +99,11 @@ export function TemplateLibrary({
 
     const categories = getAllCategories();
 
-    // Use database prompts when in addToCollection mode, otherwise use DEFAULT_PROMPTS
+    // Use database prompts if available, otherwise fallback to DEFAULT_PROMPTS
     const basePrompts = useMemo((): Array<{ id?: string; category: PromptCategory; intent: string; template: string; description: string }> => {
-        if (isAddToCollectionMode && databasePrompts.length > 0) {
-            // Convert database prompts to match PromptTemplate format
+        if (databasePrompts.length > 0) {
+            // Filter out any that might be duplicates of defaults if needed, 
+            // but the API already returns a merged set.
             return databasePrompts.map(p => ({
                 id: p.id,
                 category: p.category as PromptCategory,
@@ -112,7 +113,7 @@ export function TemplateLibrary({
             }));
         }
         return DEFAULT_PROMPTS.map(p => ({ ...p, id: undefined }));
-    }, [isAddToCollectionMode, databasePrompts]);
+    }, [databasePrompts]);
 
     const filteredPrompts = useMemo(() => {
         let prompts = basePrompts;
@@ -205,10 +206,10 @@ export function TemplateLibrary({
                     onClick={() => setActiveCategory('all')}
                     className={activeCategory === 'all' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
                 >
-                    All ({DEFAULT_PROMPTS.length})
+                    All ({basePrompts.length})
                 </Button>
                 {categories.map((category) => {
-                    const count = DEFAULT_PROMPTS.filter(p => p.category === category).length;
+                    const count = basePrompts.filter(p => p.category === category).length;
                     return (
                         <Button
                             key={category}
