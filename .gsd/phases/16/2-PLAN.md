@@ -14,8 +14,23 @@ Implement a notification system that alerts users via email when their brand's L
 - dashboard/src/lib/metrics/calculators.ts — metric calculations
 - dashboard/src/lib/metrics/pipeline.ts — metric aggregation
 - dashboard/src/lib/inngest/ — background job system
+- dashboard/src/lib/inngest/ — background job system
 - dashboard/src/app/api/ — API routes
 - **Email API**: [Resend](https://resend.com) (standard for Next.js, high deliverability)
+
+## Manual Setup Required
+
+> [!IMPORTANT]
+> These steps must be completed by the user before or during execution for alerts to function.
+
+1. **Resend Account**: 
+   - Sign up at [resend.com](https://resend.com).
+   - Create an API Key.
+   - Add `RESEND_API_KEY=re_your_key` to `dashboard/.env.local`.
+
+2. **Supabase Migration**:
+   - The task `Create alert configuration schema` will generate a SQL file.
+   - You will need to execute this SQL in your Supabase SQL Editor.
 
 ## Tasks
 
