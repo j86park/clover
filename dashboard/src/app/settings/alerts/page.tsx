@@ -34,7 +34,7 @@ export default function AlertsSettingsPage() {
             // Load brands for the form
             const brandsRes = await fetch('/api/brands');
             const brandsData = await brandsRes.json();
-            setBrands(brandsData.brands || []);
+            setBrands(brandsData.data || []);
         } catch (error) {
             console.error('Failed to load data:', error);
         } finally {
