@@ -5,3 +5,4 @@ export { classifySource, classifySources, getSourceStats, type SourceType, type 
 export { runAnalysisPipeline, analyzeSingleResponse, type PipelineConfig, type PipelineResult } from './pipeline';
 export { createExtractionPrompt, BRAND_EXTRACTION_SYSTEM_PROMPT } from './prompts';
 export { calculatePromptEffectiveness, getPromptRanking, type PromptEffectiveness, type PromptEffectivenessSummary } from './prompt-effectiveness';
+export { explainMention, type ExplainRequest, type MentionExplanation } from './explainer';
