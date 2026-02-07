@@ -7,10 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle2, Library, Plus } from 'lucide-react';
 import { startCollection, getAvailablePrompts } from '@/app/actions/collections';
 import { getBrand } from '@/app/actions/brand';
 import { AVAILABLE_MODELS } from '@/lib/openrouter/models';
+import { PromptSelectorDialog } from '@/components/prompts/prompt-selector-dialog';
 
 export default function NewCollectionPage() {
     const router = useRouter();
@@ -24,6 +25,7 @@ export default function NewCollectionPage() {
     const [availablePrompts, setAvailablePrompts] = useState<any[]>([]);
     const [selectedModels, setSelectedModels] = useState<string[]>(['gpt-4o-mini', 'gemini-2-flash']);
     const [selectedPrompts, setSelectedPrompts] = useState<string[]>([]);
+    const [isLibraryOpen, setIsLibraryOpen] = useState(false);
 
     useEffect(() => {
         async function loadData() {
@@ -40,8 +42,8 @@ export default function NewCollectionPage() {
 
             if (promptResult.success && promptResult.prompts) {
                 setAvailablePrompts(promptResult.prompts);
-                // Select all prompts by default
-                setSelectedPrompts(promptResult.prompts.map((p: any) => p.id));
+                // Select only first 5 prompts by default to avoid overwhelming runs
+                setSelectedPrompts(promptResult.prompts.slice(0, 5).map((p: any) => p.id));
             }
 
             setLoading(false);
@@ -209,14 +211,27 @@ export default function NewCollectionPage() {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="flex flex-col">
                     <CardHeader>
-                        <CardTitle>Select Prompts</CardTitle>
-                        <CardDescription>
-                            Choose the templates to run
-                        </CardDescription>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle>Select Prompts</CardTitle>
+                                <CardDescription>
+                                    Choose the templates to run
+                                </CardDescription>
+                            </div>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setIsLibraryOpen(true)}
+                                className="border-emerald-500/20 hover:bg-emerald-500/10 hover:text-emerald-400"
+                            >
+                                <Library className="h-4 w-4 mr-2" />
+                                Browse Library
+                            </Button>
+                        </div>
                     </CardHeader>
-                    <CardContent className="space-y-3">
+                    <CardContent className="space-y-3 flex-1 overflow-y-auto max-h-[400px]">
                         {availablePrompts.length > 0 ? (
                             availablePrompts.map((prompt) => (
                                 <div key={prompt.id} className="flex items-start space-x-2 pb-2 border-b last:border-0">
@@ -308,6 +323,14 @@ export default function NewCollectionPage() {
                     progress on the Collections page.
                 </AlertDescription>
             </Alert>
+
+            <PromptSelectorDialog
+                open={isLibraryOpen}
+                onOpenChange={setIsLibraryOpen}
+                availablePrompts={availablePrompts}
+                selectedPromptIds={selectedPrompts}
+                onSelectPrompts={setSelectedPrompts}
+            />
         </div>
     );
 }
