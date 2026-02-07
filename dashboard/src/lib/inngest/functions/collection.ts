@@ -5,7 +5,9 @@ import { AVAILABLE_MODELS, type ModelKey } from "@/lib/openrouter/models";
 import { generatePromptInstances } from "@/lib/collector/generator";
 import { runAnalysisPipeline } from "@/lib/analysis/pipeline";
 import { runMetricsPipeline } from "@/lib/metrics/pipeline";
-import type { Brand, Prompt, Competitor } from "@/types";
+import { evaluateAlerts, sendEmailAlert } from "@/lib/alerts";
+import type { Brand, Prompt, Competitor, Metrics } from "@/types";
+import type { AlertConfigRow, AlertTriggerResult } from "@/types/alerts";
 
 interface DBBrand extends Brand {
     competitors: Competitor[];
@@ -138,7 +140,102 @@ export const collectionStart = inngest.createFunction(
                 return await runMetricsPipeline(collectionId, supabase);
             });
 
-            // 7. Finalize
+            // 7. Evaluate and Send Alerts
+            await step.run("evaluate-alerts", async () => {
+                // Get active alert configs for this brand
+                const { data: alertConfigs } = await supabase
+                    .from('alerts')
+                    .select('*')
+                    .eq('brand_id', brandId)
+                    .eq('is_active', true);
+
+                if (!alertConfigs || alertConfigs.length === 0) {
+                    console.log('[Alerts] No active alerts for this brand');
+                    return { triggered: 0 };
+                }
+
+                // Get current collection's metrics (just calculated)
+                const { data: currentMetricsData } = await supabase
+                    .from('metrics')
+                    .select('*')
+                    .eq('collection_id', collectionId)
+                    .eq('brand_id', brandId)
+                    .single();
+
+                if (!currentMetricsData) {
+                    console.log('[Alerts] No current metrics found');
+                    return { triggered: 0 };
+                }
+
+                // Get the previous collection's metrics for comparison
+                const { data: previousCollections } = await supabase
+                    .from('collections')
+                    .select('id')
+                    .eq('brand_id', brandId)
+                    .eq('status', 'completed')
+                    .neq('id', collectionId)
+                    .order('completed_at', { ascending: false })
+                    .limit(1);
+
+                let previousMetrics: Metrics | null = null;
+                if (previousCollections && previousCollections.length > 0) {
+                    const { data: prevMetricsData } = await supabase
+                        .from('metrics')
+                        .select('*')
+                        .eq('collection_id', previousCollections[0].id)
+                        .eq('brand_id', brandId)
+                        .single();
+                    previousMetrics = prevMetricsData as Metrics | null;
+                }
+
+                if (!previousMetrics) {
+                    console.log('[Alerts] No previous metrics to compare against');
+                    return { triggered: 0 };
+                }
+
+                let triggeredCount = 0;
+
+                for (const config of alertConfigs as AlertConfigRow[]) {
+                    const triggers = evaluateAlerts({
+                        brandName: context.brand.name,
+                        currentMetrics: currentMetricsData as Metrics,
+                        previousMetrics,
+                        triggers: config.triggers,
+                    });
+
+                    if (triggers.length > 0) {
+                        // Send email
+                        const result = await sendEmailAlert({
+                            to: config.destination,
+                            brandName: context.brand.name,
+                            triggers,
+                        });
+
+                        // Log the alert
+                        for (const trigger of triggers) {
+                            await supabase.from('alert_logs').insert({
+                                alert_config_id: config.id,
+                                trigger_type: trigger.type,
+                                message: trigger.message,
+                                status: result.success ? 'sent' : 'failed',
+                                error_message: result.error || null,
+                            });
+                        }
+
+                        // Update last triggered timestamp
+                        await supabase
+                            .from('alerts')
+                            .update({ last_triggered_at: new Date().toISOString() })
+                            .eq('id', config.id);
+
+                        triggeredCount += triggers.length;
+                    }
+                }
+
+                return { triggered: triggeredCount };
+            });
+
+            // 8. Finalize
             await step.run("finalize-collection", async () => {
                 await supabase
                     .from('collections')
@@ -165,3 +262,4 @@ export const collectionStart = inngest.createFunction(
         }
     }
 );
+

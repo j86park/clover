@@ -11,6 +11,9 @@ export {
     DEFAULT_PROMPTS,
     getPromptsByCategory,
     getPromptByIntent,
+    getAllCategories,
+    getCategoryDisplayName,
     type PromptTemplate,
     type PromptCategory,
 } from './templates';
+
