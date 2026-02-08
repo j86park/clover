@@ -61,7 +61,7 @@ export function generatePDFReport(
     const metrics = [
         ['AI Share of Voice (ASoV)', `${data.metrics.asov.toFixed(1)}%`],
         ['AI-Generated Visibility Rate (AIGVR)', `${data.metrics.aigvr.toFixed(1)}%`],
-        ['Authority Score', `${data.metrics.authority_score.toFixed(0)}/100`],
+        ['Authority Score', `${data.metrics.authority_score.toFixed(2)}/3`],
         ['Sentiment Score', `${data.metrics.sentiment_score.toFixed(0)}/100`],
         ['Owned Citations', data.metrics.owned_citations.toString()],
         ['Earned Citations', data.metrics.earned_citations.toString()],
@@ -95,10 +95,57 @@ export function generatePDFReport(
         }
     }
 
-    // Page 2: Competitor Analysis
+    // Page 2: Historical Performance
+    doc.addPage();
+    doc.setFillColor(dark[0], dark[1], dark[2]);
+    doc.rect(0, 0, pageWidth, 30, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.setTextColor(255, 255, 255);
+    doc.text('Historical Performance', 20, 20);
+
+    doc.setTextColor(dark[0], dark[1], dark[2]);
+    yPos = 50;
+
+    // Table Header
+    doc.setFillColor(245, 245, 245);
+    doc.rect(20, yPos - 6, 170, 10, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text('Date', 25, yPos);
+    doc.text('ASoV', 70, yPos);
+    doc.text('AIGVR', 100, yPos);
+    doc.text('Auth (0-3)', 130, yPos);
+    doc.text('Sentiment', 160, yPos);
+
+    doc.setFont('helvetica', 'normal');
+    yPos += 12;
+
+    for (const run of data.history) {
+        const runDate = new Date(run.date).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+
+        doc.text(runDate, 25, yPos);
+        doc.text(`${run.asov.toFixed(1)}%`, 70, yPos);
+        doc.text(`${run.aigvr.toFixed(1)}%`, 100, yPos);
+        doc.text(run.authority_score.toFixed(2), 130, yPos);
+        doc.text(`${(run.sentiment_score * 100).toFixed(0)}%`, 160, yPos);
+
+        yPos += 8;
+
+        if (yPos > 270) {
+            doc.addPage();
+            yPos = 30;
+        }
+    }
+
+    // Page 3: Competitor Analysis
     doc.addPage();
 
-    // Header bar on page 2
+    // Header bar on page 3
     doc.setFillColor(dark[0], dark[1], dark[2]);
     doc.rect(0, 0, pageWidth, 30, 'F');
     doc.setFont('helvetica', 'bold');

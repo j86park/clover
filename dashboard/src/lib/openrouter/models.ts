@@ -56,6 +56,30 @@ export const AVAILABLE_MODELS = {
         provider: 'OpenAI',
         contextWindow: 128000,
     },
+    'openai-o1-mini': {
+        id: 'openai/o1-mini',
+        name: 'OpenAI o1-mini',
+        provider: 'OpenAI',
+        contextWindow: 128000,
+    },
+    'openai-o3-mini': {
+        id: 'openai/o3-mini',
+        name: 'OpenAI o3-mini',
+        provider: 'OpenAI',
+        contextWindow: 128000,
+    },
+    'gpt-5-1-mini': {
+        id: 'openai/gpt-5.1-codex-mini',
+        name: 'GPT-5.1 Mini',
+        provider: 'OpenAI',
+        contextWindow: 128000,
+    },
+    'gpt-5-2-codex': {
+        id: 'openai/gpt-5.2-codex',
+        name: 'GPT-5.2 Codex',
+        provider: 'OpenAI',
+        contextWindow: 128000,
+    },
     'deepseek-r1': {
         id: 'deepseek/deepseek-r1',
         name: 'DeepSeek R1',

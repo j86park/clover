@@ -15,6 +15,13 @@ export interface ExportData {
     };
     trends: { date: string; asov: number }[];
     competitors: { name: string; asov: number; aigvr: number }[];
+    history: {
+        date: string;
+        asov: number;
+        aigvr: number;
+        authority_score: number;
+        sentiment_score: number;
+    }[];
 }
 
 /**

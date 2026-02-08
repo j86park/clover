@@ -39,17 +39,20 @@ export default async function Home() {
   let authorityData = { owned: 0, earned: 0, external: 0 };
   let currentCollectionId = '';
 
+  let metricsHistory: any[] = [];
   if (brand) {
     // 2. Fetch all historical metrics for this brand ordered by created_at descending
-    const { data: history } = await supabase
+    const { data } = await supabase
       .from('metrics')
       .select('*')
       .eq('brand_id', brand.id)
       .order('created_at', { ascending: false });
 
-    if (history && history.length > 0) {
-      const latest = history[0];
-      const previous = history[1]; // undefined if only one run
+    metricsHistory = data || [];
+
+    if (metricsHistory.length > 0) {
+      const latest = metricsHistory[0];
+      const previous = metricsHistory[1]; // undefined if only one run
 
       currentCollectionId = latest.collection_id;
 
@@ -79,7 +82,7 @@ export default async function Home() {
       };
 
       // Full historical trend for the chart (chronological order)
-      chartData = [...history].reverse().map(r => ({
+      chartData = [...metricsHistory].reverse().map((r: any) => ({
         date: r.created_at,
         asov: r.asov
       }));
@@ -117,6 +120,13 @@ export default async function Home() {
     },
     trends: chartData,
     competitors: [], // TODO: Add competitor data when available
+    history: hasData ? metricsHistory.map((r: any) => ({
+      date: r.created_at,
+      asov: r.asov,
+      aigvr: r.aigvr,
+      authority_score: r.authority_score,
+      sentiment_score: r.sentiment_score
+    })) : [],
   };
 
   return (
