@@ -40,55 +40,51 @@ export default async function Home() {
   let currentCollectionId = '';
 
   if (brand) {
-    // 2. Get the latest completed collection for this brand
-    const { data: collection } = await supabase
-      .from('collections')
-      .select('id')
+    // 2. Fetch all historical metrics for this brand ordered by created_at descending
+    const { data: history } = await supabase
+      .from('metrics')
+      .select('*')
       .eq('brand_id', brand.id)
-      .eq('status', 'completed')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .order('created_at', { ascending: false });
 
-    if (collection) {
-      currentCollectionId = collection.id;
-      const collectionMetrics = await getCollectionMetrics(collection.id);
-      if (collectionMetrics) {
-        const bm = collectionMetrics.brand_metrics;
-        metrics = {
-          asov: bm.asov,
-          aigvr: bm.aigvr,
-          authority: bm.authority_score,
-          sentiment: bm.sentiment_score,
-          trends: {
-            asov: 0,
-            aigvr: 0,
-            authority: 0,
-            sentiment: 0,
-          }
-        };
-        authorityData = {
-          owned: bm.owned_citations || 0,
-          earned: bm.earned_citations || 0,
-          external: bm.external_citations || 0,
-        };
-        hasData = true;
+    if (history && history.length > 0) {
+      const latest = history[0];
+      const previous = history[1]; // undefined if only one run
 
-        // 3. Fetch Trend Data (Last 7 metrics records)
-        const { data: trendRecords } = await supabase
-          .from('metrics')
-          .select('created_at, asov')
-          .eq('brand_id', brand.id)
-          .order('created_at', { ascending: true })
-          .limit(7);
+      currentCollectionId = latest.collection_id;
 
-        if (trendRecords) {
-          chartData = trendRecords.map(r => ({
-            date: r.created_at,
-            asov: r.asov
-          }));
+      // Calculate trends if previous data exists
+      const calculateTrend = (curr: number, prev: number | undefined) => {
+        if (prev === undefined || prev === 0) return 0;
+        return ((curr - prev) / prev) * 100;
+      };
+
+      metrics = {
+        asov: latest.asov,
+        aigvr: latest.aigvr,
+        authority: latest.authority_score,
+        sentiment: latest.sentiment_score,
+        trends: {
+          asov: calculateTrend(latest.asov, previous?.asov),
+          aigvr: calculateTrend(latest.aigvr, previous?.aigvr),
+          authority: calculateTrend(latest.authority_score, previous?.authority_score),
+          sentiment: calculateTrend(latest.sentiment_score, previous?.sentiment_score),
         }
-      }
+      };
+
+      authorityData = {
+        owned: latest.owned_citations || 0,
+        earned: latest.earned_citations || 0,
+        external: latest.external_citations || 0,
+      };
+
+      // Full historical trend for the chart (chronological order)
+      chartData = [...history].reverse().map(r => ({
+        date: r.created_at,
+        asov: r.asov
+      }));
+
+      hasData = true;
     }
   }
 
@@ -147,25 +143,25 @@ export default async function Home() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           label="Average Share of Voice"
-          value={`${metrics.asov.toFixed(1)}%`}
+          value={`${parseFloat(metrics.asov.toFixed(2))}%`}
           trend={metrics.trends.asov}
           icon={BarChart3}
         />
         <MetricCard
           label="AI Visibility Rate"
-          value={`${metrics.aigvr.toFixed(1)}%`}
+          value={`${parseFloat(metrics.aigvr.toFixed(2))}%`}
           trend={metrics.trends.aigvr}
           icon={TrendingUp}
         />
         <MetricCard
           label="Authority Score"
-          value={hasData ? metrics.authority.toFixed(2) : metrics.authority}
+          value={hasData ? parseFloat(metrics.authority.toFixed(2)) : metrics.authority}
           trend={metrics.trends.authority}
           icon={Award}
         />
         <MetricCard
           label="Sentiment Score"
-          value={`${(hasData ? (metrics.sentiment + 1) / 2 * 100 : metrics.sentiment * 100).toFixed(0)}%`}
+          value={`${parseFloat((hasData ? (metrics.sentiment + 1) / 2 * 100 : metrics.sentiment * 100).toFixed(2))}%`}
           trend={metrics.trends.sentiment}
           icon={Heart}
         />

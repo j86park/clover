@@ -159,8 +159,8 @@ export function CitationGraph() {
         );
     }
 
-    // Empty state
-    if (!data || filteredNodes.length <= 1) {
+    // Empty state (no data at all)
+    if (!data || data.nodes.length <= 1) {
         return (
             <Card className="bg-gray-900/50 border-gray-800">
                 <CardHeader>
@@ -234,82 +234,101 @@ export function CitationGraph() {
                 <CardContent>
                     <div className="flex gap-6">
                         {/* Graph SVG */}
-                        <div className="flex-1 bg-gray-950 rounded-lg p-4 min-h-[400px]">
-                            <svg viewBox="0 0 600 400" className="w-full h-full">
-                                {/* Edges */}
-                                {sourceNodes.map((node, i) => {
-                                    const angle = (i / sourceNodes.length) * 2 * Math.PI - Math.PI / 2;
-                                    const x = centerX + radius * Math.cos(angle);
-                                    const y = centerY + radius * Math.sin(angle);
-                                    const edge = filteredEdges.find((e) => e.source === node.id);
-                                    const strokeWidth = Math.min(4, 1 + (edge?.weight || 0) / 5);
+                        <div className="flex-1 bg-gray-950 rounded-lg p-4 min-h-[400px] flex flex-col relative">
+                            {sourceNodes.length === 0 ? (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6">
+                                    <div className="w-16 h-16 rounded-full bg-gray-900 flex items-center justify-center mb-4">
+                                        <span className="text-2xl">🔍</span>
+                                    </div>
+                                    <h4 className="text-white font-medium mb-1">No {filter} citations found</h4>
+                                    <p className="text-sm text-gray-500 max-w-xs">
+                                        We couldn't find any {filter === 'all' ? '' : filter} sources for this brand in the current data set.
+                                    </p>
+                                    <Button
+                                        variant="link"
+                                        className="mt-2 text-emerald-400"
+                                        onClick={() => setFilter('all')}
+                                    >
+                                        Show all sources
+                                    </Button>
+                                </div>
+                            ) : (
+                                <svg viewBox="0 0 600 400" className="w-full h-full">
+                                    {/* Edges */}
+                                    {sourceNodes.map((node, i) => {
+                                        const angle = (i / sourceNodes.length) * 2 * Math.PI - Math.PI / 2;
+                                        const x = centerX + radius * Math.cos(angle);
+                                        const y = centerY + radius * Math.sin(angle);
+                                        const edge = filteredEdges.find((e) => e.source === node.id);
+                                        const strokeWidth = Math.min(4, 1 + (edge?.weight || 0) / 5);
 
-                                    return (
-                                        <line
-                                            key={`edge-${node.id}`}
-                                            x1={x}
-                                            y1={y}
-                                            x2={centerX}
-                                            y2={centerY}
-                                            stroke={node.sourceType ? SOURCE_COLORS[node.sourceType] : '#6b7280'}
-                                            strokeWidth={strokeWidth}
-                                            strokeOpacity={0.3}
-                                        />
-                                    );
-                                })}
-
-                                {/* Source Nodes */}
-                                {sourceNodes.map((node, i) => {
-                                    const angle = (i / sourceNodes.length) * 2 * Math.PI - Math.PI / 2;
-                                    const x = centerX + radius * Math.cos(angle);
-                                    const y = centerY + radius * Math.sin(angle);
-                                    const nodeRadius = Math.min(20, 8 + node.mentionCount / 2);
-                                    const isSelected = selectedNode?.id === node.id;
-
-                                    return (
-                                        <g
-                                            key={node.id}
-                                            className="cursor-pointer"
-                                            onClick={() => setSelectedNode(isSelected ? null : node)}
-                                        >
-                                            <circle
-                                                cx={x}
-                                                cy={y}
-                                                r={nodeRadius}
-                                                fill={node.sourceType ? SOURCE_COLORS[node.sourceType] : '#6b7280'}
-                                                stroke={isSelected ? '#fff' : 'transparent'}
-                                                strokeWidth={2}
-                                                className="transition-all hover:opacity-80"
+                                        return (
+                                            <line
+                                                key={`edge-${node.id}`}
+                                                x1={x}
+                                                y1={y}
+                                                x2={centerX}
+                                                y2={centerY}
+                                                stroke={node.sourceType ? SOURCE_COLORS[node.sourceType] : '#6b7280'}
+                                                strokeWidth={strokeWidth}
+                                                strokeOpacity={0.3}
                                             />
-                                            <title>{node.label}: {node.mentionCount} citations</title>
-                                        </g>
-                                    );
-                                })}
+                                        );
+                                    })}
 
-                                {/* Brand Node (Center) */}
-                                {brandNode && (
-                                    <g>
-                                        <circle
-                                            cx={centerX}
-                                            cy={centerY}
-                                            r={30}
-                                            fill="#14b8a6"
-                                            stroke="#5eead4"
-                                            strokeWidth={3}
-                                        />
-                                        <text
-                                            x={centerX}
-                                            y={centerY + 5}
-                                            textAnchor="middle"
-                                            fill="white"
-                                            fontSize="10"
-                                            fontWeight="bold"
-                                        >
-                                            {brandNode.label.slice(0, 8)}
-                                        </text>
-                                    </g>
-                                )}
-                            </svg>
+                                    {/* Source Nodes */}
+                                    {sourceNodes.map((node, i) => {
+                                        const angle = (i / sourceNodes.length) * 2 * Math.PI - Math.PI / 2;
+                                        const x = centerX + radius * Math.cos(angle);
+                                        const y = centerY + radius * Math.sin(angle);
+                                        const nodeRadius = Math.min(20, 8 + node.mentionCount / 2);
+                                        const isSelected = selectedNode?.id === node.id;
+
+                                        return (
+                                            <g
+                                                key={node.id}
+                                                className="cursor-pointer"
+                                                onClick={() => setSelectedNode(isSelected ? null : node)}
+                                            >
+                                                <circle
+                                                    cx={x}
+                                                    cy={y}
+                                                    r={nodeRadius}
+                                                    fill={node.sourceType ? SOURCE_COLORS[node.sourceType] : '#6b7280'}
+                                                    stroke={isSelected ? '#fff' : 'transparent'}
+                                                    strokeWidth={2}
+                                                    className="transition-all hover:opacity-80"
+                                                />
+                                                <title>{node.label}: {node.mentionCount} citations</title>
+                                            </g>
+                                        );
+                                    })}
+
+                                    {/* Brand Node (Center) */}
+                                    {brandNode && (
+                                        <g>
+                                            <circle
+                                                cx={centerX}
+                                                cy={centerY}
+                                                r={30}
+                                                fill="#14b8a6"
+                                                stroke="#5eead4"
+                                                strokeWidth={3}
+                                            />
+                                            <text
+                                                x={centerX}
+                                                y={centerY + 5}
+                                                textAnchor="middle"
+                                                fill="white"
+                                                fontSize="10"
+                                                fontWeight="bold"
+                                            >
+                                                {brandNode.label.slice(0, 8)}
+                                            </text>
+                                        </g>
+                                    )}
+                                </svg>
+                            )}
                         </div>
 
                         {/* Side Panel */}
