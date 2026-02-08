@@ -1,16 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle2, Library, Plus } from 'lucide-react';
 import { startCollection, getAvailablePrompts } from '@/app/actions/collections';
 import { getBrand } from '@/app/actions/brand';
 import { AVAILABLE_MODELS } from '@/lib/openrouter/models';
+import { PromptSelectorDialog } from '@/components/prompts/prompt-selector-dialog';
 
 export default function NewCollectionPage() {
     const router = useRouter();
@@ -24,6 +25,10 @@ export default function NewCollectionPage() {
     const [availablePrompts, setAvailablePrompts] = useState<any[]>([]);
     const [selectedModels, setSelectedModels] = useState<string[]>(['gpt-4o-mini', 'gemini-2-flash']);
     const [selectedPrompts, setSelectedPrompts] = useState<string[]>([]);
+    const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+
+    const COLLECTION_PROMPTS_KEY = 'clover_collection_prompts';
+    const SELECTED_PROMPTS_KEY = 'clover_selected_prompts';
 
     useEffect(() => {
         async function loadData() {
@@ -40,14 +45,103 @@ export default function NewCollectionPage() {
 
             if (promptResult.success && promptResult.prompts) {
                 setAvailablePrompts(promptResult.prompts);
-                // Select all prompts by default
-                setSelectedPrompts(promptResult.prompts.map((p: any) => p.id));
+
+                // Check for pending prompt IDs from library page (cross-page navigation)
+                let pendingIds: string[] = [];
+                if (typeof window !== 'undefined') {
+                    const stored = localStorage.getItem(COLLECTION_PROMPTS_KEY);
+                    if (stored) {
+                        pendingIds = JSON.parse(stored);
+                        localStorage.removeItem(COLLECTION_PROMPTS_KEY);
+                    }
+                }
+
+                if (pendingIds.length > 0) {
+                    // Merge pending IDs with existing selection
+                    const existingIds: string[] = JSON.parse(localStorage.getItem(SELECTED_PROMPTS_KEY) || '[]');
+                    // Validate that pending IDs exist in available prompts
+                    const validPendingIds = pendingIds.filter((id: string) =>
+                        promptResult.prompts.some((p: any) => p.id === id)
+                    );
+                    const mergedIds = [...new Set([...existingIds, ...validPendingIds])];
+                    setSelectedPrompts(mergedIds);
+                    localStorage.setItem(SELECTED_PROMPTS_KEY, JSON.stringify(mergedIds));
+                } else {
+                    // Try to restore from persisted selection
+                    const persisted = localStorage.getItem(SELECTED_PROMPTS_KEY);
+                    if (persisted) {
+                        const ids = JSON.parse(persisted);
+                        // Validate that persisted IDs still exist in available prompts
+                        const validIds = ids.filter((id: string) =>
+                            promptResult.prompts.some((p: any) => p.id === id)
+                        );
+                        setSelectedPrompts(validIds);
+                    } else {
+                        // First time: select first 5 prompts by default
+                        const defaultIds = promptResult.prompts.slice(0, 5).map((p: any) => p.id);
+                        setSelectedPrompts(defaultIds);
+                        localStorage.setItem(SELECTED_PROMPTS_KEY, JSON.stringify(defaultIds));
+                    }
+                }
             }
 
             setLoading(false);
         }
         loadData();
     }, []);
+
+    // Sync prompts from localStorage when returning to this page
+    const syncPendingPrompts = useCallback(() => {
+        if (typeof window === 'undefined') return;
+        // Don't sync if prompts haven't loaded yet
+        if (availablePrompts.length === 0) return;
+
+        const stored = localStorage.getItem(COLLECTION_PROMPTS_KEY);
+        if (stored) {
+            const pendingIds: string[] = JSON.parse(stored);
+
+            if (pendingIds.length > 0) {
+                // Validate that pending IDs exist in availablePrompts
+                const validPendingIds = pendingIds.filter((id: string) =>
+                    availablePrompts.some((p: any) => p.id === id)
+                );
+
+                if (validPendingIds.length > 0) {
+                    setSelectedPrompts(prev => {
+                        const merged = [...new Set([...prev, ...validPendingIds])];
+                        localStorage.setItem(SELECTED_PROMPTS_KEY, JSON.stringify(merged));
+                        return merged;
+                    });
+                }
+            }
+            // Only remove after processing
+            localStorage.removeItem(COLLECTION_PROMPTS_KEY);
+        }
+    }, [availablePrompts]);
+
+    // Check for pending prompts when page regains focus or visibility
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                syncPendingPrompts();
+            }
+        };
+
+        const handleFocus = () => {
+            syncPendingPrompts();
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('focus', handleFocus);
+
+        // Also check immediately in case we just navigated back
+        syncPendingPrompts();
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [syncPendingPrompts]);
 
     const handleModelToggle = (modelKey: string) => {
         setSelectedModels(prev =>
@@ -58,11 +152,16 @@ export default function NewCollectionPage() {
     };
 
     const handlePromptToggle = (promptId: string) => {
-        setSelectedPrompts(prev =>
-            prev.includes(promptId)
+        setSelectedPrompts(prev => {
+            const updated = prev.includes(promptId)
                 ? prev.filter(id => id !== promptId)
-                : [...prev, promptId]
-        );
+                : [...prev, promptId];
+            // Persist to localStorage
+            if (typeof window !== 'undefined') {
+                localStorage.setItem(SELECTED_PROMPTS_KEY, JSON.stringify(updated));
+            }
+            return updated;
+        });
     };
 
     const handleStart = async () => {
@@ -209,38 +308,61 @@ export default function NewCollectionPage() {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="flex flex-col">
                     <CardHeader>
-                        <CardTitle>Select Prompts</CardTitle>
-                        <CardDescription>
-                            Choose the templates to run
-                        </CardDescription>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle>Selected Prompts</CardTitle>
+                                <CardDescription>
+                                    {selectedPrompts.length} prompt{selectedPrompts.length !== 1 ? 's' : ''} selected for this run
+                                </CardDescription>
+                            </div>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setIsLibraryOpen(true)}
+                                className="border-emerald-500/20 hover:bg-emerald-500/10 hover:text-emerald-400"
+                            >
+                                <Library className="h-4 w-4 mr-2" />
+                                Browse Library
+                            </Button>
+                        </div>
                     </CardHeader>
-                    <CardContent className="space-y-3">
-                        {availablePrompts.length > 0 ? (
-                            availablePrompts.map((prompt) => (
-                                <div key={prompt.id} className="flex items-start space-x-2 pb-2 border-b last:border-0">
-                                    <Checkbox
-                                        id={`prompt-${prompt.id}`}
-                                        checked={selectedPrompts.includes(prompt.id)}
-                                        onCheckedChange={() => handlePromptToggle(prompt.id)}
-                                        className="mt-1"
-                                    />
-                                    <div className="flex-1 space-y-1">
-                                        <Label
-                                            htmlFor={`prompt-${prompt.id}`}
-                                            className="text-sm font-medium leading-none cursor-pointer capitalize"
+                    <CardContent className="space-y-2 flex-1 overflow-y-auto max-h-[400px]">
+                        {selectedPrompts.length > 0 ? (
+                            availablePrompts
+                                .filter(p => selectedPrompts.includes(p.id))
+                                .map((prompt) => (
+                                    <div key={prompt.id} className="flex items-start justify-between gap-2 p-2 rounded-lg border border-gray-800 bg-emerald-500/5">
+                                        <div className="flex-1 space-y-1 min-w-0">
+                                            <p className="text-sm font-medium leading-none capitalize truncate">
+                                                {prompt.category}: {prompt.intent}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground line-clamp-1 italic">
+                                                "{prompt.template}"
+                                            </p>
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handlePromptToggle(prompt.id)}
+                                            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-7 px-2"
                                         >
-                                            {prompt.category}: {prompt.intent}
-                                        </Label>
-                                        <p className="text-xs text-muted-foreground line-clamp-2 italic">
-                                            "{prompt.template}"
-                                        </p>
+                                            Remove
+                                        </Button>
                                     </div>
-                                </div>
-                            ))
+                                ))
                         ) : (
-                            <p className="text-sm text-muted-foreground">No prompts found in database.</p>
+                            <div className="text-center py-8 text-muted-foreground">
+                                <p className="text-sm">No prompts selected.</p>
+                                <Button
+                                    variant="link"
+                                    onClick={() => setIsLibraryOpen(true)}
+                                    className="text-emerald-400 hover:text-emerald-300 mt-2"
+                                >
+                                    Browse the library to add prompts
+                                </Button>
+                            </div>
                         )}
                     </CardContent>
                 </Card>
@@ -308,6 +430,20 @@ export default function NewCollectionPage() {
                     progress on the Collections page.
                 </AlertDescription>
             </Alert>
+
+            <PromptSelectorDialog
+                open={isLibraryOpen}
+                onOpenChange={setIsLibraryOpen}
+                availablePrompts={availablePrompts}
+                selectedPromptIds={selectedPrompts}
+                onSelectPrompts={setSelectedPrompts}
+                onRefresh={async () => {
+                    const result = await getAvailablePrompts();
+                    if (result.success && result.prompts) {
+                        setAvailablePrompts(result.prompts);
+                    }
+                }}
+            />
         </div>
     );
 }

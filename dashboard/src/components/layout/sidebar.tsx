@@ -10,6 +10,9 @@ import {
     BarChart3,
     Users,
     Settings,
+    Wand2,
+    Link2,
+    MessageSquare,
 } from 'lucide-react';
 
 const navItems = [
@@ -27,6 +30,21 @@ const navItems = [
         title: 'Analysis',
         href: '/analysis',
         icon: BarChart3,
+    },
+    {
+        title: 'Citations',
+        href: '/citations',
+        icon: Link2,
+    },
+    {
+        title: 'Ask Data',
+        href: '/query',
+        icon: MessageSquare,
+    },
+    {
+        title: 'Prompt Builder',
+        href: '/prompts/builder',
+        icon: Wand2,
     },
     {
         title: 'Competitors',

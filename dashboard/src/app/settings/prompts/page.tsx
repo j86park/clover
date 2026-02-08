@@ -13,21 +13,34 @@ export default async function PromptsSettingsPage() {
     // Get user's active prompts from database
     const { data: { user } } = await supabase.auth.getUser();
 
-    let activePrompts: { id: string; intent: string; is_active: boolean }[] = [];
+    let allPrompts: { id: string; intent: string; is_active: boolean }[] = [];
+
+    let query = supabase
+        .from('prompts')
+        .select('id, intent, is_active, user_id')
+        .eq('is_active', true);
 
     if (user) {
-        const { data: prompts } = await supabase
-            .from('prompts')
-            .select('id, intent, is_active')
-            .eq('user_id', user.id);
-
-        if (prompts) {
-            activePrompts = prompts;
-        }
+        query = query.or(`user_id.is.null,user_id.eq.${user.id}`);
+    } else {
+        query = query.is('user_id', null);
     }
 
-    const activeCount = activePrompts.filter(p => p.is_active).length;
-    const totalLibrary = DEFAULT_PROMPTS.length;
+    const { data: prompts } = await query;
+
+    if (prompts && prompts.length > 0) {
+        allPrompts = prompts;
+    } else {
+        // Fallback to defaults if DB query fails or is empty
+        allPrompts = DEFAULT_PROMPTS.map((p, i) => ({
+            id: `default-${i}`,
+            intent: p.intent,
+            is_active: true
+        }));
+    }
+
+    const activeCount = allPrompts.length;
+    const totalLibrary = allPrompts.length;
 
     return (
         <div className="space-y-6">

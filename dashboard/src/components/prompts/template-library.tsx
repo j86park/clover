@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +13,7 @@ import {
     type PromptCategory,
     type PromptTemplate,
 } from '@/lib/prompts';
-import { Search, Plus, Check, Sparkles, Scale, Star, ShoppingCart, TrendingUp } from 'lucide-react';
+import { Search, Plus, Check, Sparkles, Scale, Star, ShoppingCart, TrendingUp, ArrowLeft } from 'lucide-react';
 
 interface TemplateLibraryProps {
     onSelectTemplate?: (template: PromptTemplate) => void;
@@ -36,18 +37,86 @@ const categoryColors: Record<PromptCategory, string> = {
     trending: 'bg-pink-500/10 text-pink-400 border-pink-500/20',
 };
 
+const COLLECTION_PROMPTS_KEY = 'clover_collection_prompts';
+
+interface DatabasePrompt {
+    id: string;
+    category: string;
+    intent: string;
+    template: string;
+    user_id?: string | null;
+}
+
 export function TemplateLibrary({
     onSelectTemplate,
     selectedIntents = [],
     showAddButton = true,
 }: TemplateLibraryProps) {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const isAddToCollectionMode = searchParams.get('addToCollection') === 'true';
+
     const [searchQuery, setSearchQuery] = useState('');
     const [activeCategory, setActiveCategory] = useState<PromptCategory | 'all'>('all');
+    const [addedIds, setAddedIds] = useState<string[]>([]);
+    const [databasePrompts, setDatabasePrompts] = useState<DatabasePrompt[]>([]);
+    const [loadingDbPrompts, setLoadingDbPrompts] = useState(false);
+
+    // Fetch database prompts on mount
+    useEffect(() => {
+        setLoadingDbPrompts(true);
+        fetch('/api/prompts')
+            .then(res => res.json())
+            .then(response => {
+                if (response.data) {
+                    setDatabasePrompts(response.data);
+                }
+            })
+            .catch(err => console.error('Failed to fetch prompts:', err))
+            .finally(() => setLoadingDbPrompts(false));
+
+        if (isAddToCollectionMode) {
+            // Load existing added prompt IDs from localStorage
+            const existing = localStorage.getItem(COLLECTION_PROMPTS_KEY);
+            if (existing) {
+                setAddedIds(JSON.parse(existing));
+            }
+        }
+    }, [isAddToCollectionMode]);
+
+    const handleAddToCollection = (promptId: string) => {
+        if (typeof window !== 'undefined') {
+            const existing = localStorage.getItem(COLLECTION_PROMPTS_KEY);
+            const currentIds: string[] = existing ? JSON.parse(existing) : [];
+
+            if (!currentIds.includes(promptId)) {
+                const updated = [...currentIds, promptId];
+                localStorage.setItem(COLLECTION_PROMPTS_KEY, JSON.stringify(updated));
+                setAddedIds(updated);
+            }
+        }
+    };
 
     const categories = getAllCategories();
 
+    // Use database prompts if available, otherwise fallback to DEFAULT_PROMPTS
+    const basePrompts = useMemo((): Array<{ id?: string; category: PromptCategory; intent: string; template: string; description: string }> => {
+        if (databasePrompts.length > 0) {
+            // Filter out any that might be duplicates of defaults if needed, 
+            // but the API already returns a merged set.
+            return databasePrompts.map(p => ({
+                id: p.id,
+                category: p.category as PromptCategory,
+                intent: p.intent,
+                template: p.template,
+                description: p.intent, // Use intent as description for display
+            }));
+        }
+        return DEFAULT_PROMPTS.map(p => ({ ...p, id: undefined }));
+    }, [databasePrompts]);
+
     const filteredPrompts = useMemo(() => {
-        let prompts = DEFAULT_PROMPTS;
+        let prompts = basePrompts;
 
         // Filter by category
         if (activeCategory !== 'all') {
@@ -66,10 +135,12 @@ export function TemplateLibrary({
         }
 
         return prompts;
-    }, [activeCategory, searchQuery]);
+    }, [basePrompts, activeCategory, searchQuery]);
+
+    type ExtendedPrompt = { id?: string; category: PromptCategory; intent: string; template: string; description: string };
 
     const promptsByCategory = useMemo(() => {
-        const grouped: Record<string, PromptTemplate[]> = {};
+        const grouped: Record<string, ExtendedPrompt[]> = {};
         for (const prompt of filteredPrompts) {
             if (!grouped[prompt.category]) {
                 grouped[prompt.category] = [];
@@ -86,9 +157,34 @@ export function TemplateLibrary({
     };
 
     const isSelected = (intent: string) => selectedIntents.includes(intent);
+    const isAddedToQueue = (promptId: string | undefined) => promptId ? addedIds.includes(promptId) : false;
 
     return (
         <div className="space-y-6">
+            {/* Floating banner when in addToCollection mode */}
+            {isAddToCollectionMode && (
+                <div className="sticky top-0 z-20 -mx-6 px-6 py-3 bg-emerald-500/10 border-b border-emerald-500/20 backdrop-blur-sm">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <ArrowLeft className="h-4 w-4 text-emerald-400" />
+                            <span className="text-sm">
+                                {addedIds.length > 0
+                                    ? <><strong className="text-emerald-400">{addedIds.length}</strong> prompt{addedIds.length !== 1 ? 's' : ''} added to collection</>
+                                    : 'Click prompts below to add them to your collection'
+                                }
+                            </span>
+                        </div>
+                        <Button
+                            onClick={() => router.push('/collections/new')}
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white"
+                            size="sm"
+                        >
+                            {addedIds.length > 0 ? 'Done — Back to Collection' : 'Back to Collection'}
+                        </Button>
+                    </div>
+                </div>
+            )}
+
             {/* Search and Filters */}
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1">
@@ -110,10 +206,10 @@ export function TemplateLibrary({
                     onClick={() => setActiveCategory('all')}
                     className={activeCategory === 'all' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
                 >
-                    All ({DEFAULT_PROMPTS.length})
+                    All ({basePrompts.length})
                 </Button>
                 {categories.map((category) => {
-                    const count = DEFAULT_PROMPTS.filter(p => p.category === category).length;
+                    const count = basePrompts.filter(p => p.category === category).length;
                     return (
                         <Button
                             key={category}
@@ -143,8 +239,8 @@ export function TemplateLibrary({
                                 <Card
                                     key={template.intent}
                                     className={`cursor-pointer transition-all ${isSelected(template.intent)
-                                            ? 'ring-2 ring-emerald-500 bg-emerald-500/5'
-                                            : 'hover:bg-white/[0.06]'
+                                        ? 'ring-2 ring-emerald-500 bg-emerald-500/5'
+                                        : 'hover:bg-white/[0.06]'
                                         }`}
                                     onClick={() => handleSelectTemplate(template)}
                                 >
@@ -167,19 +263,26 @@ export function TemplateLibrary({
                                         <p className="text-sm text-muted-foreground font-mono bg-black/20 p-2 rounded">
                                             {template.template}
                                         </p>
-                                        {showAddButton && !isSelected(template.intent) && (
-                                            <Button
-                                                size="sm"
-                                                variant="ghost"
-                                                className="mt-3 w-full hover:bg-emerald-500/10 hover:text-emerald-400"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleSelectTemplate(template);
-                                                }}
-                                            >
-                                                <Plus className="h-4 w-4 mr-1" />
-                                                Add to Collection
-                                            </Button>
+                                        {(showAddButton || isAddToCollectionMode) && !isSelected(template.intent) && (
+                                            isAddedToQueue(template.id) ? (
+                                                <div className="mt-3 w-full flex items-center justify-center gap-2 py-2 text-emerald-400">
+                                                    <Check className="h-4 w-4" />
+                                                    <span className="text-sm">Added to Collection</span>
+                                                </div>
+                                            ) : template.id ? (
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    className="mt-3 w-full hover:bg-emerald-500/10 hover:text-emerald-400"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleAddToCollection(template.id!);
+                                                    }}
+                                                >
+                                                    <Plus className="h-4 w-4 mr-1" />
+                                                    Add to Collection
+                                                </Button>
+                                            ) : null
                                         )}
                                     </CardContent>
                                 </Card>

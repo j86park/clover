@@ -25,7 +25,7 @@ export function MetricCard({ label, value, trend, icon: Icon, variant = 'default
                 <div className="text-2xl font-bold">{value}</div>
                 {trend !== undefined && (
                     <Badge variant={trendColor} className="mt-2">
-                        {trendPrefix}{trend}% from previous
+                        {trendPrefix}{parseFloat(trend.toFixed(2))}% from previous
                     </Badge>
                 )}
             </CardContent>

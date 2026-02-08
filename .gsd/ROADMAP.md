@@ -209,11 +209,36 @@
 ---
 
 ### Phase 16: MVP Feature Enhancements
-**Status**: 🆕 Planned
+**Status**: ✅ Complete
 **Objective**: Add high-impact, low-effort features to enhance MVP value proposition
 
 **Deliverables:**
-- Prompt Library Templates with pre-built, research-backed templates
-- Email Alerts for significant metric changes
-- Export to PDF/CSV for shareable reports
-- Competitor Watchlist for quick competitor monitoring
+- Prompt Library Templates with pre-built, research-backed templates ✓
+- Email Alerts for significant metric changes ✓
+- Export to PDF/CSV for shareable reports ✓
+- Competitor Watchlist for quick competitor monitoring ✓
+
+---
+
+### Phase 17: Tier 2 — Medium-Impact Differentiators
+**Status**: ✅ Complete
+**Objective**: Add medium-effort features that differentiate the product and provide deeper insights
+
+**Deliverables:**
+- **17.1: Prompt Effectiveness Scoring** — Analyze which prompts generate the most favorable brand mentions ✓
+- **17.2: "Why Did They Say That?" Explainer** — Follow-up LLM call explaining reasoning behind each recommendation ✓
+- **17.3: Prompt Builder Wizard** — Guided UI to construct effective prompts with category → intent → brand/competitor toggles ✓
+- **17.4: Model-by-Model Breakdown** — Radar charts and heatmaps showing how GPT-4, Claude, Gemini perceive brands differently ✓
+
+---
+
+### Phase 18: Tier 3 — Advanced Intelligence Features
+**Status**: ✅ Complete
+**Objective**: Add advanced features that require significant development effort but provide unique value
+
+**Deliverables:**
+- **18.1: Recommendations Engine** — Actionable suggestions to improve brand visibility ("Your brand is rarely cited. Consider publishing more on owned domains.") ✓
+- **18.2: Content Gap Analysis** — Identify topics where competitors are mentioned but you're not ✓
+- **18.3: Citation Network Visualization** — Interactive graph showing which sources cite your brand (owned/earned/external) ✓
+- **18.4: Scheduled Collections** — Automated daily/weekly data collection runs via Inngest cron ✓
+- **18.5: Natural Language Query Interface** — Ask questions about your data in plain English ("What was my best week?") ✓

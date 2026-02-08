@@ -133,5 +133,38 @@ export interface QuickCheckResult {
     checkedAt: string;
 }
 
+// Re-export prompt effectiveness types
+export type { PromptEffectiveness, PromptEffectivenessSummary } from '@/lib/analysis/prompt-effectiveness';
+
+// Collection Schedule Type
+export interface CollectionSchedule {
+    id: string;
+    user_id: string;
+    brand_id: string;
+    schedule_type: 'daily' | 'weekly' | 'custom';
+    cron_expression: string | null;
+    time_utc: string; // HH:MM format
+    day_of_week: number | null; // 0-6, 0 = Sunday
+    is_active: boolean;
+    last_run_at: string | null;
+    next_run_at: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+// Query Engine Types
+export interface QueryIntent {
+    metricType: 'asov' | 'aigvr' | 'sentiment' | 'citations' | 'general';
+    timeRange: 'last_week' | 'last_month' | 'last_quarter' | 'all_time';
+    comparison?: string; // competitor name or 'competitors'
+    filters?: Record<string, any>;
+}
+
+export interface QueryResult {
+    answer: string;
+    data?: any[];
+    sql?: string;
+    intent?: QueryIntent;
+}
 
 export * from './testing';

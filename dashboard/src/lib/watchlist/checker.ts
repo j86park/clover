@@ -3,19 +3,10 @@
  * Performs lightweight competitor analysis using minimal prompts
  */
 
-import OpenAI from 'openai';
+import { queryLLM } from '@/lib/openrouter/client';
 import type { QuickCheckResult } from '@/types';
 
-// Lazy-load OpenAI client to avoid build-time initialization errors
-let openaiClient: OpenAI | null = null;
-function getOpenAI(): OpenAI {
-    if (!openaiClient) {
-        openaiClient = new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY,
-        });
-    }
-    return openaiClient;
-}
+const CHECKER_MODEL = 'openai/gpt-4o-mini';
 
 /**
  * Quick-check prompts for competitor analysis
@@ -81,15 +72,14 @@ export async function quickCheckCompetitor(
     const results = await Promise.all(
         prompts.map(async (prompt) => {
             try {
-                const completion = await getOpenAI().chat.completions.create({
-                    model: 'gpt-4o-mini',
-                    messages: [{ role: 'user', content: prompt }],
-                    max_tokens: 500,
+                const response = await queryLLM(CHECKER_MODEL, [
+                    { role: 'user', content: prompt }
+                ], {
+                    maxTokens: 500,
                     temperature: 0.7,
                 });
 
-                const response = completion.choices[0]?.message?.content || '';
-                return analyzeResponse(response, competitorName);
+                return analyzeResponse(response.content, competitorName);
             } catch (error) {
                 console.error('Quick check prompt failed:', error);
                 return { mentioned: false, sentiment: 0, position: null };

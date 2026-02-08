@@ -50,6 +50,18 @@ export const AVAILABLE_MODELS = {
         provider: 'Perplexity',
         contextWindow: 127000,
     },
+    'openai-o1': {
+        id: 'openai/o1',
+        name: 'OpenAI o1',
+        provider: 'OpenAI',
+        contextWindow: 128000,
+    },
+    'deepseek-r1': {
+        id: 'deepseek/deepseek-r1',
+        name: 'DeepSeek R1',
+        provider: 'DeepSeek',
+        contextWindow: 128000,
+    },
 } as const;
 
 export type ModelKey = keyof typeof AVAILABLE_MODELS;
